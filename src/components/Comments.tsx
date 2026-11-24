@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { addComment, deleteComment, listComments, setCommentHidden } from "../lib/api/comments";
+import { errorCode } from "../lib/api/client";
 import { useAsync } from "../lib/useAsync";
 import { useMe } from "../lib/auth";
 import { fmtRelative } from "../lib/format";
@@ -100,8 +101,9 @@ function Composer({ me, postId, parentId, onAdded, autoFocus, onCancel }: Compos
       onAdded(await addComment(postId, me, text, parentId));
       setText("");
       toast("success", parentId ? "Yanıtın eklendi." : "Yorumun eklendi. Şerefe!");
-    } catch {
-      toast("error", "Yorum gönderilemedi. Tekrar dene.");
+    } catch (err) {
+      if (errorCode(err) === "23505") { setText(""); toast("info", "Bu yorumu az önce gönderdin."); } // supabase/006_comment_dedupe.sql
+      else toast("error", "Yorum gönderilemedi. Tekrar dene.");
     } finally {
       sending.current = false;
       setBusy(false);

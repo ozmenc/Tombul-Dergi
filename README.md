@@ -49,7 +49,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
 **Site URL** canlı adres olmalı, **Redirect URLs** listesinde `https://<canlı adres>/sifre-yenile` bulunmalı.
