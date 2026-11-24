@@ -13,6 +13,9 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 - **Şifremi unuttum** (`/sifremi-unuttum` → e-posta → `/sifre-yenile`).
 - **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, resim boyutu: `![](url "küçük")` / `"orta"`, öne çıkarma yalnızca admin).
   Admin ayrıca kategorileri, üyeleri (e-postalar, başvuru onayı, roller, yazar ekleme, şifre sıfırlama) ve yorumları (gizle / sil) yönetir.
+- **Hukuki koruma**: `/kosullar` (kullanım koşulları ve sorumluluk reddi, 5651 yer sağlayıcı); kayıtta zorunlu onay
+  (sürüm ve tarih hesabın `user_metadata`sına yazılır); yazı altında, yorum kutusunda, editörde ve kenar çubuğunda sorumluluk notu;
+  yazı ve yorumlarda **Bildir** (herkes gönderir, yalnızca admin görür: Panel → Moderasyon).
 - Aydınlık ve koyu tema; her sayfada yükleniyor, boş, hata ve 404 durumları.
 - Maskot: `src/components/Bottle.tsx` (gözleri imleci izler; sevinç, üzgün, utangaç, dolum, devrik halleri).
 
@@ -49,7 +52,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
 **Site URL** canlı adres olmalı, **Redirect URLs** listesinde `https://<canlı adres>/sifre-yenile` bulunmalı.

@@ -33,7 +33,7 @@ export default function PanelLayout() {
           <NavLink to="/panel/yazilar">Yazılar</NavLink>
           {me.role === "admin" && <NavLink to="/panel/kategoriler">Kategoriler</NavLink>}
           {me.role === "admin" && <NavLink to="/panel/uyeler">Üyeler</NavLink>}
-          {me.role === "admin" && <NavLink to="/panel/yorumlar">Yorumlar</NavLink>}
+          {me.role === "admin" && <NavLink to="/panel/yorumlar">Moderasyon</NavLink>}
         </nav>
         <Link to="/panel/yeni" className="btn btn-primary"><Icon name="plus" /> Yeni yazı</Link>
       </div>

@@ -9,6 +9,7 @@ import type { FeedPost } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { FollowButton, SaveButton, ShareButton, VoteButtons } from "../components/Actions";
 import { Comments } from "../components/Comments";
+import { ContentNotice, ReportButton } from "../components/Report";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
 import { ErrorState, FeedSkeleton, NotFound } from "../components/States";
@@ -64,7 +65,9 @@ function Article({ post }: { post: FeedPost }) {
           <span className="spacer" />
           <SaveButton postId={post.id} large />
           <ShareButton slug={post.slug} title={post.title} large />
+          <ReportButton target={{ postId: post.id }} large />
         </div>
+        <ContentNotice kind="post" />
       </article>
 
       <Comments postId={post.id} postAuthorId={post.author_id} onCountChange={onCount} />

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { addComment, deleteComment, listComments, setCommentHidden } from "../lib/api/comments";
 import { errorCode } from "../lib/api/client";
+import { ReportButton } from "./Report";
 import { useAsync } from "../lib/useAsync";
 import { useMe } from "../lib/auth";
 import { fmtRelative } from "../lib/format";
@@ -126,6 +127,7 @@ function Composer({ me, postId, parentId, onAdded, autoFocus, onCancel }: Compos
             <button className="btn btn-sm btn-primary" disabled={busy || !text.trim() || over}>{busy ? "Gönderiliyor…" : parentId ? "Yanıtla" : "Gönder"}</button>
           </div>
         )}
+        {(text || parentId) && <p className="content-notice">Göndererek yorumundan yalnızca senin sorumlu olduğunu kabul edersin. <Link to="/kosullar">Kullanım koşulları</Link></p>}
       </form>
     </div>
   );
@@ -176,6 +178,7 @@ function CommentItem({ c, postAuthorId, fresh, children, onReply, onRemoved, onH
           <VoteButtons kind="comment" id={c.id} likes={c.likes} dislikes={c.dislikes} myVote={c.myVote} />
           {onReply && <button type="button" className="act" onClick={onReply}><Icon name="reply" /> Yanıtla</button>}
           {(mine || isAdmin) && <button type="button" className="act" onClick={remove} style={armed ? { color: "var(--danger)" } : undefined}><Icon name="trash" /> {armed ? "Eminim, sil" : "Sil"}</button>}
+          {!mine && <ReportButton target={{ commentId: c.id }} />}
           {isAdmin && <button type="button" className="act" onClick={hide}><Icon name={c.hidden ? "eye" : "eyeOff"} /> {c.hidden ? "Göster" : "Gizle"}</button>}
         </div>
         {children}

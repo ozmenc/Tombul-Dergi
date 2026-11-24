@@ -23,10 +23,14 @@ export async function caller(req) {
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Doğrulanmış (e-posta onayı gerekmeyen) hesap açar; çakışmada 409. */
-export async function createAccount({ email, password, name, wantsAuthor }) {
+// Kullanım koşulları sürümü (src/pages/Terms.tsx "Son güncelleme"); kabul tarihiyle hesaba yazılır.
+const TERMS_VERSION = "2026-11-24";
+
+export async function createAccount({ email, password, name, wantsAuthor, acceptedTerms = false }) {
+  const terms = acceptedTerms ? { terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString() } : {};
   const res = await sb("/auth/v1/admin/users", {
     method: "POST",
-    body: JSON.stringify({ email, password, email_confirm: true, user_metadata: { name, wants_author: wantsAuthor ? "true" : "false" } }),
+    body: JSON.stringify({ email, password, email_confirm: true, user_metadata: { name, wants_author: wantsAuthor ? "true" : "false", ...terms } }),
   });
   const user = await res.json();
   if (res.ok) return { ok: true, id: user.id };

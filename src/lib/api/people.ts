@@ -71,7 +71,7 @@ export const createAuthor = (body: { name: string; email: string; password: stri
 export const resetPassword = async (userId: string) => (await postJson("/api/password", { userId }, true)).password as string;
 
 /** Herkese açık kayıt (api/signup.js), ardından oturum açar. */
-export async function signUp(body: { name: string; email: string; password: string; wantsAuthor: boolean; website: string }) {
+export async function signUp(body: { name: string; email: string; password: string; wantsAuthor: boolean; website: string; acceptedTerms: boolean }) {
   await postJson("/api/signup", body);
   const { error } = await supabase.auth.signInWithPassword({ email: body.email.trim(), password: body.password });
   if (error) throw new Error("Hesabın açıldı ama giriş yapılamadı. Giriş sayfasından dene.");

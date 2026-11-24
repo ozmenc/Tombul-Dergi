@@ -94,7 +94,7 @@ export function Signup() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
-  const [form, setForm] = useState({ name: "", email: "", password: "", wantsAuthor: false, website: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", wantsAuthor: false, website: "", acceptedTerms: false });
   const [shy, setShy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -108,6 +108,7 @@ export function Signup() {
     if (!form.name.trim()) return setError("Adını yaz.");
     if (!EMAIL_RE.test(form.email.trim())) return setError("Geçerli bir e-posta yaz.");
     if (form.password.length < 8) return setError("Şifre en az 8 karakter olmalı.");
+    if (!form.acceptedTerms) return setError("Kayıt için kullanım koşullarını kabul etmelisin.");
     setBusy(true);
     try {
       await signUp(form);
@@ -132,6 +133,11 @@ export function Signup() {
         <label className="check" style={{ marginBottom: 18 }}>
           <input type="checkbox" checked={form.wantsAuthor} onChange={(e) => set("wantsAuthor", e.target.checked)} />
           <span><strong>Yazar olmak istiyorum</strong><span>Yönetim onaylayınca yazı yazabilirsin. Beklerken okuyup yorum yapabilirsin.</span></span>
+        </label>
+        <label className="check" style={{ marginBottom: 18 }}>
+          <input type="checkbox" checked={form.acceptedTerms} onChange={(e) => set("acceptedTerms", e.target.checked)} required />
+          <span><strong><Link to="/kosullar" target="_blank">Kullanım koşullarını</Link> okudum ve kabul ediyorum</strong>
+            <span>Paylaştığım yazı ve yorumlardan hukuken yalnızca ben sorumluyum; Tombul Dergi sorumluluk kabul etmez.</span></span>
         </label>
         {error && <p className="form-error" role="alert">{error}</p>}
         <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Hesabın açılıyor…" : "Kayıt ol"}</button>

@@ -243,6 +243,7 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
           <button className="btn btn-primary btn-block btn-lg" disabled={saving || !!uploading}>
             {saving ? "Kaydediliyor…" : v.status === "published" && saved.status !== "published" ? "Kaydet ve yayınla" : "Kaydet"}
           </button>
+          <p className="content-notice">Yayınlayarak yazının içeriğinden (metin, görsel, alıntı) hukuken yalnızca senin sorumlu olduğunu ve <Link to="/kosullar">kullanım koşullarını</Link> kabul edersin.</p>
           <span className="help" style={{ textAlign: "center" }}>{dirty ? "Kaydedilmemiş değişiklikler var" : initial ? "Tüm değişiklikler kaydedildi" : ""}</span>
           {initial && saved.status === "published" && <Link className="btn btn-block" to={`/yazi/${saved.slug}`} target="_blank"><Icon name="eye" /> Sitede gör</Link>}
           {initial && (

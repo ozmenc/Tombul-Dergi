@@ -55,6 +55,7 @@ const router = createBrowserRouter([
       { path: "/yazarlar", element: <Authors /> },
       { path: "/yazar/:id", element: <AuthorPage /> },
       { path: "/kaydedilenler", element: <Saved /> },
+      { path: "/kosullar", lazy: lazy(() => import("./pages/Terms")) },
       { path: "/hesap", element: <Account /> },
       { path: "*", element: <NotFound /> },
     ],

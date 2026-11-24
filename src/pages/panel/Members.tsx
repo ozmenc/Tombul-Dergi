@@ -164,7 +164,7 @@ function AddAuthor({ onAdded }: { onAdded: () => void }) {
   return (
     <form className="card panel-section" onSubmit={submit} noValidate>
       <PanelHead title="Yazar ekle" />
-      <p className="muted" style={{ marginBottom: 16 }}>Hesap hemen açılır. Geçici şifreyi yazara sen ilet; Hesabım sayfasından değiştirebilir.</p>
+      <p className="muted" style={{ marginBottom: 16 }}>Hesap hemen açılır. Geçici şifreyi yazara sen ilet; Hesabım sayfasından değiştirebilir. Kullanım koşullarını da ilet: yazar, yazı yayınlayarak içerikten yalnızca kendisinin sorumlu olduğunu kabul eder.</p>
       <div className="grid-2">
         <label className="field"><span>Ad</span><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={80} /></label>
         <label className="field"><span>E-posta</span><input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></label>

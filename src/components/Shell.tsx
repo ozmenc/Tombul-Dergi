@@ -125,6 +125,7 @@ function Aside() {
           <Link to="/hesap#yazarlik" className="btn btn-amber">Başvur</Link>
         </section>
       )}
+      <p className="content-notice">Yazı ve yorumlardan yalnızca yazanlar sorumludur. <Link to="/kosullar">Kullanım koşulları</Link></p>
     </aside>
   );
 }

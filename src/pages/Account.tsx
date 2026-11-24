@@ -97,6 +97,7 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
 
       <Authorship me={me} refresh={refresh} />
       <PasswordForm />
+      <p className="content-notice">Paylaştığın yazı ve yorumlardan hukuken yalnızca sen sorumlusun. <Link to="/kosullar">Kullanım koşulları</Link></p>
     </>
   );
 }
@@ -115,7 +116,7 @@ function Authorship({ me, refresh }: { me: Profile; refresh: () => Promise<void>
       <Bottle mood={me.role === "pending" ? "filling" : me.role === "reader" ? "idle" : "happy"} size={64} />
       <div style={{ flex: 1 }}>
         <h2>Yazarlık</h2>
-        {me.role === "reader" && <p className="muted">Yazar olursan kendi yazılarını yazıp yayınlayabilirsin. Başvurunu yönetim onaylar.</p>}
+        {me.role === "reader" && <p className="muted">Yazar olursan kendi yazılarını yazıp yayınlayabilirsin. Başvurunu yönetim onaylar. Yayınladığın yazılardan yalnızca sen sorumlu olursun.</p>}
         {me.role === "pending" && <p className="muted">Başvurun inceleniyor. Onaylanınca panelin açılacak; o zamana kadar okumaya ve yorum yapmaya devam edebilirsin.</p>}
         {(me.role === "author" || me.role === "admin") && <p className="muted">Yazarsın. Yeni yazılarını panelden yazabilirsin.</p>}
       </div>

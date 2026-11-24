@@ -131,3 +131,4 @@ a.row:hover { color: var(--ink); background: var(--surface-2); border-radius: va
 
 /* ---------- Çökme ekranı (iskelet dışı) ---------- */
 .shell-lite { max-width: 640px; margin: 0 auto; padding: 48px var(--gutter); }
+.terms .prose h2 { font-size: 21px; margin-top: 1.6em; }
