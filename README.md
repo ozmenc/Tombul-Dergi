@@ -1,6 +1,6 @@
 # Tombul Dergi
 
-Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritabanı, giriş, resimler), Vercel.
+Üyelerin kaleminden bir çevrimiçi dergi. Vite + React + TypeScript, Supabase (veritabanı, giriş, resimler), Vercel.
 
 ## Neler var
 
