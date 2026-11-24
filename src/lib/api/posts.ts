@@ -27,15 +27,6 @@ export async function listPublished(f: FeedFilter = {}): Promise<ListedPost[]> {
   return withCheers(must<Post[]>(await q));
 }
 
-/** En çok tokuşturulan yazılar, sırasıyla. */
-export async function listMostCheered(limit = 5): Promise<ListedPost[]> {
-  const rows = must<{ post_id: string; n: number }[]>(await supabase.rpc("most_cheered", { p_limit: limit }));
-  if (!rows.length) return [];
-  const posts = must<Post[]>(await supabase.from("posts").select(POST_FIELDS).in("id", rows.map((r) => r.post_id)));
-  const byId = new Map(posts.map((p) => [p.id, p]));
-  return rows.flatMap((r) => { const p = byId.get(r.post_id); return p ? [{ ...p, cheers: Number(r.n) }] : []; });
-}
-
 export async function getPublished(slug: string) {
   if (!SLUG_RE.test(slug)) return null;
   const post = must<Post | null>(await supabase.from("posts").select(POST_FIELDS).eq("slug", slug).eq("status", "published").maybeSingle());

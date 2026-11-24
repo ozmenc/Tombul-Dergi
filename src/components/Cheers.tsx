@@ -3,7 +3,7 @@ import { sendCheers } from "../lib/api/cheers";
 import { useToast } from "./Toast";
 
 const BATCH_MS = 600; // hızlı tıklamalar birikir, tek istekte gider
-const MAX_BATCH = 50; // api/cheer.js sınırı
+const MAX_BATCH = 50; // tek istekte en fazla (api/cheer.js)
 const DROPS = [-16, -9, -2, 6, 13, 19].map((dx, i) => ({ "--dx": `${dx}px`, "--dy": `${-12 - (i % 3) * 5}px` }) as React.CSSProperties);
 
 /** Bira şişesi: boyun, omuz, gövde, etiket ve kapak; `x` gövdenin ortası. */

@@ -29,7 +29,7 @@ export function clientIpHash(req) {
   return createHmac("sha256", KEY).update(ip).digest("hex");
 }
 
-/** Bir günden eski sınır kayıtlarını siler (signup_attempts, cheer_hits). */
+/** Bir günden eski kayıt denemelerini siler (signup_attempts). */
 export const pruneOld = (table) => sb(`/rest/v1/${table}?created_at=lt.${new Date(Date.now() - 86400e3).toISOString()}`, { method: "DELETE" });
 
 const SIGNUPS_PER_HOUR = 5;
