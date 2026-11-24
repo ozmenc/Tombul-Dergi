@@ -65,8 +65,6 @@ export const parseTags = (input: string) => [...new Set(input.split(",").map(nor
 /** PostgREST `or` filtresini bozabilecek karakterleri atar. */
 export const sanitizeSearch = (q: string) => q.replace(/[,()*%\\:"]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
 
-/** Popülerlik: beğeni ve yorum artırır, beğenmeme azaltır. */
-export const popularity = (s: { likes: number; dislikes: number; comments: number }) => s.likes * 2 + s.comments * 3 - s.dislikes;
 
 /** Her kişiye kimliğinden türetilen sabit bir renk. */
 export const PALETTE = ["#ffaa2c", "#ff9cc6", "#9be7c4", "#b7c6ff", "#ffd36e"];

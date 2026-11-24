@@ -82,7 +82,7 @@ export function Login() {
         <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Giriş yapılıyor…" : "Giriş yap"}</button>
       </form>
       <p className="auth-switch">Hesabın yok mu? <Link to={`/kayit${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>Kayıt ol</Link></p>
-      <p className="help">Şifreni mi unuttun? Dergi yönetimine yaz; panelden sana yeni bir geçici şifre üretirler.</p>
+      <p className="auth-switch"><Link to="/sifremi-unuttum">Şifremi unuttum</Link></p>
     </AuthLayout>
   );
 }
@@ -137,6 +137,90 @@ export function Signup() {
         <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Hesabın açılıyor…" : "Kayıt ol"}</button>
       </form>
       <p className="auth-switch">Zaten üye misin? <Link to={`/giris${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>Giriş yap</Link></p>
+    </AuthLayout>
+  );
+}
+
+/** E-postaya şifre yenileme bağlantısı. Hesap var mı yok mu belli etmez. */
+export function ForgotPassword() {
+  useTitle("Şifremi unuttum");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!EMAIL_RE.test(email.trim())) return setError("Geçerli bir e-posta yaz.");
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${location.origin}/sifre-yenile` });
+    setBusy(false);
+    if (error?.status === 429) return setError("Çok fazla deneme yapıldı. Birkaç dakika sonra tekrar dene ya da dergi yönetimine yaz.");
+    if (error) return setError("Bağlantı gönderilemedi. Birazdan tekrar dene ya da dergi yönetimine yaz.");
+    setSent(true);
+  }
+
+  return (
+    <AuthLayout shy={false} title="Şifreni mi unuttun?" lede="E-postanı yaz, sana yeni şifre belirleme bağlantısı gönderelim.">
+      {sent ? (
+        <div className="state" role="status">
+          <h2>E-postanı kontrol et</h2>
+          <p>Bu adresle bir hesap varsa yenileme bağlantısı birkaç dakika içinde gelir. Gereksiz klasörüne de bak.</p>
+          <Link className="btn btn-primary" to="/giris">Girişe dön</Link>
+        </div>
+      ) : (
+        <form onSubmit={submit} noValidate>
+          <label className="field"><span>E-posta</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required /></label>
+          {error && <p className="form-error" role="alert">{error}</p>}
+          <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Gönderiliyor…" : "Bağlantı gönder"}</button>
+          <p className="auth-switch"><Link to="/giris">Girişe dön</Link></p>
+        </form>
+      )}
+    </AuthLayout>
+  );
+}
+
+/** E-postadaki bağlantıyla gelen (kurtarma oturumu açık) kullanıcı yeni şifresini belirler. */
+export function ResetPassword() {
+  useTitle("Yeni şifre");
+  const auth = useAuth();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [pw, setPw] = useState({ a: "", b: "" });
+  const [shy, setShy] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  if (auth.status === "loading") return <Spinner />;
+  if (auth.status !== "signed-in")
+    return (
+      <AuthLayout shy={false} title="Bağlantı geçersiz" lede="Bu yenileme bağlantısının süresi dolmuş ya da daha önce kullanılmış.">
+        <Link className="btn btn-primary btn-lg btn-block" to="/sifremi-unuttum">Yeni bağlantı iste</Link>
+      </AuthLayout>
+    );
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (pw.a.length < 8) return setError("Şifre en az 8 karakter olmalı.");
+    if (pw.a !== pw.b) return setError("İki şifre aynı değil.");
+    setError("");
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw.a });
+    setBusy(false);
+    if (error) return setError("Şifre değiştirilemedi: " + error.message);
+    toast("success", "Yeni şifren kaydedildi. Şerefe!");
+    navigate("/", { replace: true });
+  }
+
+  return (
+    <AuthLayout shy={shy} title="Yeni şifre belirle" lede={`${auth.profile.name || "Merhaba"}, hesabın için yeni bir şifre seç.`}>
+      <form onSubmit={submit} noValidate>
+        <PasswordField label="Yeni şifre" value={pw.a} onChange={(a) => setPw((p) => ({ ...p, a }))} onFocus={() => setShy(true)} onBlur={() => setShy(false)} autoComplete="new-password" />
+        <PasswordField label="Yeni şifre (tekrar)" value={pw.b} onChange={(b) => setPw((p) => ({ ...p, b }))} onFocus={() => setShy(true)} onBlur={() => setShy(false)} autoComplete="new-password" />
+        {error && <p className="form-error" role="alert">{error}</p>}
+        <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Kaydediliyor…" : "Şifreyi kaydet"}</button>
+      </form>
     </AuthLayout>
   );
 }

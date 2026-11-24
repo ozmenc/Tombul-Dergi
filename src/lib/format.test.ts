@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { excerpt, fmtRelative, initials, normalizeTag, parseTags, plainText, popularity, readingMinutes, sanitizeSearch, slugify, SLUG_RE } from "./format";
+import { excerpt, fmtRelative, initials, normalizeTag, parseTags, plainText, readingMinutes, sanitizeSearch, slugify, SLUG_RE } from "./format";
 
 describe("slugify", () => {
   it("Türkçe karakterleri sadeleştirir", () => {
@@ -55,8 +55,5 @@ describe("metin yardımcıları", () => {
     expect(fmtRelative("2026-11-24T09:00:00Z", now)).toBe("3 sa önce");
     expect(fmtRelative("2026-11-22T12:00:00Z", now)).toBe("2 gün önce");
     expect(fmtRelative("bozuk", now)).toBe("");
-  });
-  it("popülerlik beğenmemeyi cezalandırır", () => {
-    expect(popularity({ likes: 3, dislikes: 0, comments: 1 })).toBeGreaterThan(popularity({ likes: 3, dislikes: 4, comments: 1 }));
   });
 });

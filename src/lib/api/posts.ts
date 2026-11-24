@@ -41,6 +41,15 @@ export async function listPublished(f: FeedFilter = {}): Promise<FeedPost[]> {
   return withSocial(must<Post[]>(await q));
 }
 
+/** Popüler yazılar: sıralama sunucuda (supabase/004_popular.sql). */
+export async function listPopular(f: { categoryId?: string; limit?: number } = {}): Promise<FeedPost[]> {
+  const ids = must<string[]>(await supabase.rpc("popular_post_ids", { p_limit: f.limit ?? 20, p_category: f.categoryId ?? null }));
+  if (ids.length === 0) return [];
+  const posts = await listPublished({ ids, limit: ids.length });
+  const rank = new Map(ids.map((id, i) => [id, i]));
+  return posts.sort((a, b) => rank.get(a.id)! - rank.get(b.id)!);
+}
+
 export async function getPublished(slug: string): Promise<FeedPost | null> {
   if (!SLUG_RE.test(slug)) return null;
   const post = must<Post | null>(await supabase.from("posts").select(POST_FIELDS).eq("slug", slug).eq("status", "published").maybeSingle());

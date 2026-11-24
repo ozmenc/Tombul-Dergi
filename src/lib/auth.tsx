@@ -24,7 +24,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setUserId(s?.user.id ?? null));
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      setUserId(s?.user.id ?? null);
+      // Yenileme bağlantısı başka bir sayfaya düşerse (ör. Supabase'in Site URL'i) yeni şifre sayfasına geç.
+      if (event === "PASSWORD_RECOVERY" && location.pathname !== "/sifre-yenile") location.replace("/sifre-yenile");
+    });
     return () => data.subscription.unsubscribe();
   }, []);
 

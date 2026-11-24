@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router";
-import { listPublished } from "../lib/api/posts";
+import { listPopular, listPublished } from "../lib/api/posts";
 import { listAuthors } from "../lib/api/people";
 import { listCategories } from "../lib/api/categories";
 import { useAsync } from "../lib/useAsync";
@@ -8,7 +8,6 @@ import { usePaged } from "../lib/usePaged";
 import { useTitle } from "../lib/useTitle";
 import { useMe } from "../lib/auth";
 import { useSocial } from "../lib/social";
-import { popularity } from "../lib/format";
 import { canWrite } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { Icon } from "../components/Icon";
@@ -33,14 +32,10 @@ export default function Feed() {
   // Takip listesi ya da kategori kimliği henüz gelmediyse yanlış bir ilk sayfa çekme.
   const waiting = (tab === "takip" && !ready) || (!!cat && cats.status === "loading");
   const { state: posts, retry, more, hasMore, moreBusy } = usePaged(
-    async (limit) => {
+    (limit) => {
       if (waiting) return new Promise<never>(() => {});
       if (tab === "takip") return listPublished({ authorIds: [...following], categoryId, limit });
-      if (tab === "populer") {
-        // shortcut: popülerlik sayaçlardan hesaplanır; son 200 yazı içinde sıralanır. Yazılar binleri bulunca sunucuda sırala.
-        const all = await listPublished({ categoryId, limit: 200 });
-        return all.sort((a, b) => popularity(b.stats) - popularity(a.stats)).slice(0, limit);
-      }
+      if (tab === "populer") return listPopular({ categoryId, limit });
       return listPublished({ categoryId, limit });
     },
     [tab, categoryId, tab === "takip" ? followIds : "", me?.id, waiting]

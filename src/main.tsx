@@ -16,7 +16,7 @@ import Authors from "./pages/Authors";
 import AuthorPage from "./pages/AuthorPage";
 import Saved from "./pages/Saved";
 import Account from "./pages/Account";
-import { Login, Signup } from "./pages/AuthPages";
+import { ForgotPassword, Login, ResetPassword, Signup } from "./pages/AuthPages";
 
 // Panel sadece yazarlara lazım: ayrı parçalarda yüklenir.
 const lazy = (load: () => Promise<{ default: ComponentType }>) => async () => ({ Component: (await load()).default });
@@ -43,6 +43,8 @@ function Crash() {
 const router = createBrowserRouter([
   { path: "/giris", element: <Login />, errorElement: <Crash /> },
   { path: "/kayit", element: <Signup />, errorElement: <Crash /> },
+  { path: "/sifremi-unuttum", element: <ForgotPassword />, errorElement: <Crash /> },
+  { path: "/sifre-yenile", element: <ResetPassword />, errorElement: <Crash /> },
   {
     element: <Shell />,
     errorElement: <Crash />,
