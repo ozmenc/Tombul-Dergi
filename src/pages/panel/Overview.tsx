@@ -49,8 +49,7 @@ export default function Overview() {
         {isAdmin && counts.status === "success" && counts.data && (
           <>
             <Stat icon="users" label="Üye" value={counts.data.members} to="/panel/uyeler" />
-            <Stat icon="check" label="Onay bekleyen" value={counts.data.unapproved} to="/panel/uyeler?sekme=onay" />
-            <Stat icon="shield" label="Yazarlık başvurusu" value={counts.data.pending} to="/panel/uyeler?sekme=basvuru" />
+            <Stat icon="check" label="Onay bekleyen" value={counts.data.pending} to="/panel/uyeler?sekme=onay" />
             <Stat icon="eyeOff" label="Gizli yorum" value={counts.data.hidden} to="/panel/yorumlar?gizli=1" />
             <Stat icon="dislike" label="Beğenmeme" value={sum("dislikes")} />
           </>
@@ -59,10 +58,10 @@ export default function Overview() {
 
       {isAdmin && pending.length > 0 && (
         <section className="card panel-section">
-          <PanelHead title="Onay bekleyen yazarlar"><Link to="/panel/uyeler?sekme=basvuru" className="btn btn-sm">Tümü</Link></PanelHead>
+          <PanelHead title="Onay bekleyen hesaplar"><Link to="/panel/uyeler?sekme=onay" className="btn btn-sm">Tümü</Link></PanelHead>
           <ul className="rows">
             {pending.slice(0, 4).map((m) => (
-              <li key={m.id} className="row"><Avatar person={m} size={38} /><span className="row-main"><strong>{m.name || "İsimsiz"}</strong><small>{fmtRelative(m.created_at)} başvurdu</small></span></li>
+              <li key={m.id} className="row"><Avatar person={m} size={38} /><span className="row-main"><strong>{m.name || "İsimsiz"}</strong><small>{fmtRelative(m.created_at)} katıldı</small></span></li>
             ))}
           </ul>
         </section>

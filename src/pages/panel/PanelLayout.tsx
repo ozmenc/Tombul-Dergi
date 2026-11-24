@@ -20,8 +20,8 @@ export default function PanelLayout() {
   if (!canWrite(me.role))
     return (
       <Forbidden>
-        {me.role === "pending" ? "Yazarlık başvurun inceleniyor. Onaylanınca panelin açılacak." : "Panel yazarlar için. Yazmak istersen başvurabilirsin."}
-        <br /><Link to="/hesap#yazarlik">Başvuru durumuna bak</Link>
+        Hesabın yönetim onayı bekliyor. Onaylanınca yazı paylaşabilirsin.
+        <br /><Link to="/hesap#durum">Hesap durumuna bak</Link>
       </Forbidden>
     );
 

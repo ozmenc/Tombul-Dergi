@@ -29,7 +29,7 @@ export function ThemeToggle() {
 }
 
 /** "Yaz" düğmesinin gideceği yer: yazar → editör, okur → başvuru, ziyaretçi → kayıt. */
-const writeTarget = (me: Profile | null) => (!me ? "/kayit" : canWrite(me.role) ? "/panel/yeni" : "/hesap#yazarlik");
+const writeTarget = (me: Profile | null) => (!me ? "/kayit" : canWrite(me.role) ? "/panel/yeni" : "/hesap#durum");
 
 function Rail() {
   const auth = useAuth();
@@ -114,15 +114,14 @@ function Aside() {
       {!me && (
         <section className="aside-box aside-cta">
           <h2>Sen de yaz.</h2>
-          <p>Kayıt ol, yorum yap, beğen. Yazar olmak istersen başvur; onay gelince yazıların yayında.</p>
+          <p>Kayıt ol; yönetim hesabını onaylayınca yazı paylaşır, yorum yapar, beğenirsin.</p>
           <Link to="/kayit" className="btn btn-amber">Kayıt ol</Link>
         </section>
       )}
-      {me?.role === "reader" && (
+      {me?.role === "pending" && (
         <section className="aside-box aside-cta">
-          <h2>Yazmak ister misin?</h2>
-          <p>Yazarlık için başvur, yönetim onaylayınca panelin açılır.</p>
-          <Link to="/hesap#yazarlik" className="btn btn-amber">Başvur</Link>
+          <h2>Onay bekleniyor</h2>
+          <p>Hesabın yönetim onayında. Onaylanınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin.</p>
         </section>
       )}
       <p className="content-notice">Yazı ve yorumlardan yalnızca yazanlar sorumludur. <Link to="/kosullar">Kullanım koşulları</Link></p>

@@ -94,7 +94,7 @@ export function Signup() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
-  const [form, setForm] = useState({ name: "", email: "", password: "", wantsAuthor: false, website: "", acceptedTerms: false });
+  const [form, setForm] = useState({ name: "", email: "", password: "", website: "", acceptedTerms: false });
   const [shy, setShy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -112,7 +112,7 @@ export function Signup() {
     setBusy(true);
     try {
       await signUp(form);
-      toast("success", form.wantsAuthor ? "Hoş geldin! Hesabın ve yazarlık başvurun yönetim onayını bekliyor." : "Hoş geldin! Yorum yazabilmen için hesabın yönetim onayını bekliyor.");
+      toast("success", "Hoş geldin! Hesabın yönetim onayını bekliyor; onaylanınca yazı ve yorum paylaşabilirsin.");
       navigate(next, { replace: true });
     } catch (err) {
       setError((err as Error).message);
@@ -122,7 +122,7 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout shy={shy} title="Aramıza katıl" lede="Oku, beğen, kaydet. Yönetim hesabını onaylayınca yorum yazabilirsin; istersen yazarlığa da başvur.">
+    <AuthLayout shy={shy} title="Aramıza katıl" lede="Yönetim hesabını onaylayınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin.">
       <form onSubmit={submit} noValidate>
         <label className="field"><span>Adın</span><input value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={80} required /></label>
         <label className="field"><span>E-posta</span><input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" required /></label>
@@ -130,10 +130,6 @@ export function Signup() {
         <p className="help" style={{ marginTop: -10, marginBottom: 16 }}>En az 8 karakter.</p>
         {/* bot tuzağı: insanlar görmez, doldurmaz */}
         <input className="sr-only" tabIndex={-1} aria-hidden="true" autoComplete="off" value={form.website} onChange={(e) => set("website", e.target.value)} name="website" />
-        <label className="check" style={{ marginBottom: 18 }}>
-          <input type="checkbox" checked={form.wantsAuthor} onChange={(e) => set("wantsAuthor", e.target.checked)} />
-          <span><strong>Yazar olmak istiyorum</strong><span>Yönetim onaylayınca yazı yazabilirsin. Beklerken okuyup yorum yapabilirsin.</span></span>
-        </label>
         <label className="check" style={{ marginBottom: 18 }}>
           <input type="checkbox" checked={form.acceptedTerms} onChange={(e) => set("acceptedTerms", e.target.checked)} required />
           <span><strong><Link to="/kosullar" target="_blank">Kullanım koşullarını</Link> okudum ve kabul ediyorum</strong>

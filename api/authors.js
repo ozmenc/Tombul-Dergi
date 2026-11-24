@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const { email, password, name } = req.body || {};
   const invalid = validateAccount({ email, password, name });
   if (invalid) return res.status(400).json({ error: invalid });
-  const out = await createAccount({ email: email.trim(), password, name: name.trim(), wantsAuthor: false });
+  const out = await createAccount({ email: email.trim(), password, name: name.trim() });
   if (!out.ok) return res.status(out.status).json({ error: out.error });
 
   const promoted = await sb(`/rest/v1/profiles?id=eq.${out.id}`, { method: "PATCH", body: JSON.stringify({ role: "author" }) });

@@ -6,7 +6,7 @@ import { ReportButton } from "./Report";
 import { useAsync } from "../lib/useAsync";
 import { useMe } from "../lib/auth";
 import { fmtRelative } from "../lib/format";
-import { canComment, type Comment, type Profile } from "../lib/types";
+import { canWrite, type Comment, type Profile } from "../lib/types";
 import { Avatar } from "./Avatar";
 import { VoteButtons } from "./Actions";
 import { Icon } from "./Icon";
@@ -51,7 +51,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
         </div>
       </div>
 
-      {!me ? <LoginNudge /> : canComment(me) ? <Composer me={me} postId={postId} parentId={null} onAdded={added} /> : <AwaitingApproval />}
+      {!me ? <LoginNudge /> : canWrite(me.role) ? <Composer me={me} postId={postId} parentId={null} onAdded={added} /> : <AwaitingApproval />}
 
       {state.status === "loading" && <ListSkeleton rows={3} />}
       {state.status === "error" && <ErrorState title="Yorumlar yüklenemedi" error={state.error} onRetry={retry} />}
@@ -59,7 +59,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
         <p className="muted" style={{ textAlign: "center", padding: "12px 0" }}>Henüz yorum yok. İlk yorumu sen yaz.</p>
       )}
       {threads.map(({ c, replies }) => (
-        <CommentItem key={c.id} c={c} postAuthorId={postAuthorId} fresh={fresh === c.id} onReply={canComment(me) ? () => setReplyTo(replyTo === c.id ? null : c.id) : undefined} onRemoved={removed} onHidden={toggledHidden}>
+        <CommentItem key={c.id} c={c} postAuthorId={postAuthorId} fresh={fresh === c.id} onReply={canWrite(me?.role) ? () => setReplyTo(replyTo === c.id ? null : c.id) : undefined} onRemoved={removed} onHidden={toggledHidden}>
           {(replies.length > 0 || replyTo === c.id) && (
             <div className="replies">
               {replies.map((r) => <CommentItem key={r.id} c={r} postAuthorId={postAuthorId} fresh={fresh === r.id} onRemoved={removed} onHidden={toggledHidden} />)}
@@ -75,7 +75,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
 function AwaitingApproval() {
   return (
     <div className="login-nudge" role="status">
-      <p>Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin; o zamana kadar okuyabilir, beğenebilir ve kaydedebilirsin.</p>
+      <p>Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilir, beğenebilir ve yazı paylaşabilirsin; o zamana kadar okuyabilirsin.</p>
     </div>
   );
 }
@@ -85,7 +85,7 @@ function LoginNudge() {
   const next = encodeURIComponent(pathname + "#yorumlar");
   return (
     <div className="login-nudge">
-      <p>Yorum yapmak, beğenmek ve yanıtlamak için giriş yap.</p>
+      <p>Yorum yapmak ve beğenmek için üye ol; yönetim hesabını onaylayınca başlayabilirsin.</p>
       <Link className="btn" to={`/giris?next=${next}`}>Giriş yap</Link>
       <Link className="btn btn-primary" to={`/kayit?next=${next}`}>Kayıt ol</Link>
     </div>

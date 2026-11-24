@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { votePost, voteComment } from "../lib/api/social";
 import { useSocial } from "../lib/social";
 import { useMe } from "../lib/auth";
-import { useRequireLogin } from "../lib/useRequireLogin";
+import { useRequireMember } from "../lib/useRequireMember";
 import type { Vote } from "../lib/types";
 import { Icon } from "./Icon";
 import { useToast } from "./Toast";
@@ -16,7 +16,7 @@ type VoteProps = { kind: "post" | "comment"; id: string; likes: number; dislikes
 
 /** Beğen / beğenme. Aynı düğmeye tekrar basmak oyu geri alır. */
 export function VoteButtons({ kind, id, likes, dislikes, myVote, large = false }: VoteProps) {
-  const requireLogin = useRequireLogin();
+  const requireLogin = useRequireMember();
   const toast = useToast();
   const [s, setS] = useState({ likes, dislikes, mine: myVote });
   const [burst, setBurst] = useState(0);
@@ -61,7 +61,7 @@ export function VoteButtons({ kind, id, likes, dislikes, myVote, large = false }
 
 export function SaveButton({ postId, large = false }: { postId: string; large?: boolean }) {
   const { saved, toggleSave } = useSocial();
-  const requireLogin = useRequireLogin();
+  const requireLogin = useRequireMember();
   const toast = useToast();
   const on = saved.has(postId);
   async function click() {
@@ -102,7 +102,7 @@ export function ShareButton({ slug, title, large = false }: { slug: string; titl
 export function FollowButton({ authorId, small = false }: { authorId: string; small?: boolean }) {
   const me = useMe();
   const { following, toggleFollow } = useSocial();
-  const requireLogin = useRequireLogin();
+  const requireLogin = useRequireMember();
   const toast = useToast();
   if (me?.id === authorId) return null;
   const on = following.has(authorId);

@@ -55,7 +55,7 @@ export default function Feed() {
   return (
     <>
       <div className="stories" aria-label="Yazarlar">
-        <Link to={!me ? "/kayit" : canWrite(me.role) ? "/panel/yeni" : "/hesap#yazarlik"} className="story story-add">
+        <Link to={!me ? "/kayit" : canWrite(me.role) ? "/panel/yeni" : "/hesap#durum"} className="story story-add">
           <span className="ring"><span className="avatar" style={{ width: 66, height: 66, background: "var(--surface)", color: "var(--muted)" }}><Icon name="plus" /></span></span>
           <span>{me && canWrite(me.role) ? "Yeni yazı" : "Sen de yaz"}</span>
         </Link>

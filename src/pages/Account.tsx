@@ -1,12 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router";
-import { applyForAuthor, updateProfile } from "../lib/api/people";
+import { updateProfile } from "../lib/api/people";
 import { IMAGE_TYPES, uploadImage } from "../lib/api/storage";
 import { supabase } from "../lib/supabase";
 import { signOut, useAuth } from "../lib/auth";
 import { fmtDate } from "../lib/format";
 import { useTitle } from "../lib/useTitle";
-import { canComment, ROLE_LABEL, type Profile } from "../lib/types";
+import { canWrite, ROLE_LABEL, type Profile } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { Bottle } from "../components/Bottle";
 import { Icon } from "../components/Icon";
@@ -68,10 +68,9 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
       <header className="profile-head card">
         <Avatar person={{ id: me.id, name: profile.name || me.name, avatar_url: profile.avatar_url }} size={96} ring />
         <div className="profile-text">
-          <span className="badge badge-blue">{ROLE_LABEL[me.role]}</span>{" "}
-          {!canComment(me) && <span className="badge badge-amber">Onay bekliyor</span>}
+          <span className={`badge ${canWrite(me.role) ? "badge-blue" : "badge-amber"}`}>{ROLE_LABEL[me.role]}</span>
           <h1>{me.name || "Hesabım"}</h1>
-          <p className="muted">{canComment(me) ? "Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür." : "Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin."}</p>
+          <p className="muted">{canWrite(me.role) ? "Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür." : "Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin."}</p>
         </div>
         <button type="button" className="btn" onClick={() => signOut()}><Icon name="logout" /> Çıkış yap</button>
       </header>
@@ -81,10 +80,12 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
         <div className="field">
           <span>Fotoğraf</span>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <label className="btn">
-              {uploading ? "Yükleniyor…" : "Fotoğraf seç"}
-              <input type="file" accept={IMAGE_TYPES.join(",")} className="sr-only" disabled={uploading} onChange={onAvatar} />
-            </label>
+            {canWrite(me.role) ? (
+              <label className="btn">
+                {uploading ? "Yükleniyor…" : "Fotoğraf seç"}
+                <input type="file" accept={IMAGE_TYPES.join(",")} className="sr-only" disabled={uploading} onChange={onAvatar} />
+              </label>
+            ) : <span className="help">Hesabın onaylanınca fotoğraf yükleyebilirsin.</span>}
             {profile.avatar_url && <button type="button" className="linkish" onClick={() => setProfile((p) => ({ ...p, avatar_url: "" }))}>Fotoğrafı kaldır</button>}
           </div>
         </div>
@@ -96,33 +97,26 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
         <button className="btn btn-primary" disabled={saving || uploading}>{saving ? "Kaydediliyor…" : "Profili kaydet"}</button>
       </form>
 
-      <Authorship me={me} refresh={refresh} />
+      <MemberStatus me={me} />
       <PasswordForm />
       <p className="content-notice">Paylaştığın yazı ve yorumlardan hukuken yalnızca sen sorumlusun. <Link to="/kosullar">Kullanım koşulları</Link></p>
     </>
   );
 }
 
-function Authorship({ me, refresh }: { me: Profile; refresh: () => Promise<void> }) {
-  const toast = useToast();
-  const [busy, setBusy] = useState(false);
-  async function apply() {
-    setBusy(true);
-    try { await applyForAuthor(me.id); await refresh(); toast("success", "Başvurun yönetime iletildi."); }
-    catch { toast("error", "Başvuru gönderilemedi. Tekrar dene."); }
-    finally { setBusy(false); }
-  }
+/** Hesap durumu: onay bekliyor ya da onaylı üye. */
+function MemberStatus({ me }: { me: Profile }) {
+  const approved = canWrite(me.role);
   return (
-    <section id="yazarlik" className="card form-card authorship">
-      <Bottle mood={me.role === "pending" ? "filling" : me.role === "reader" ? "idle" : "happy"} size={64} />
+    <section id="durum" className="card form-card authorship">
+      <Bottle mood={approved ? "happy" : "filling"} size={64} />
       <div style={{ flex: 1 }}>
-        <h2>Yazarlık</h2>
-        {me.role === "reader" && <p className="muted">Yazar olursan kendi yazılarını yazıp yayınlayabilirsin. Başvurunu yönetim onaylar. Yayınladığın yazılardan yalnızca sen sorumlu olursun.</p>}
-        {me.role === "pending" && <p className="muted">Başvurun inceleniyor. Onaylanınca panelin açılacak; o zamana kadar okumaya ve yorum yapmaya devam edebilirsin.</p>}
-        {(me.role === "author" || me.role === "admin") && <p className="muted">Yazarsın. Yeni yazılarını panelden yazabilirsin.</p>}
+        <h2>Üyelik</h2>
+        <p className="muted">{approved
+          ? "Hesabın onaylı. Yazı paylaşabilir, yorum yazabilir, beğenebilir ve takip edebilirsin."
+          : "Hesabın yönetim onayı bekliyor. Onaylanınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin; o zamana kadar yazıları okuyabilirsin."}</p>
       </div>
-      {me.role === "reader" && <button className="btn btn-amber" onClick={apply} disabled={busy}>{busy ? "Gönderiliyor…" : "Yazarlık için başvur"}</button>}
-      {(me.role === "author" || me.role === "admin") && <Link className="btn btn-primary" to="/panel/yeni"><Icon name="pen" /> Yeni yazı</Link>}
+      {approved && <Link className="btn btn-primary" to="/panel/yeni"><Icon name="pen" /> Yeni yazı</Link>}
     </section>
   );
 }

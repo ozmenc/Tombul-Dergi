@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { AdminOnly, PanelHead, usePanel } from "./PanelLayout";
-import { createAuthor, listMemberEmails, listMembers, resetPassword, setApproved, setRole } from "../../lib/api/people";
+import { createAuthor, listMemberEmails, listMembers, resetPassword, setRole } from "../../lib/api/people";
 import { useAsync } from "../../lib/useAsync";
 import { useTitle } from "../../lib/useTitle";
 import { EMAIL_RE, fmtRelative } from "../../lib/format";
@@ -16,12 +16,11 @@ export default function Members() {
   return <AdminOnly><MemberManager /></AdminOnly>;
 }
 
-const TABS = [["onay", "Onay bekleyenler"], ["basvuru", "Yazarlık başvuruları"], ["hepsi", "Tüm üyeler"]] as const;
+const TABS = [["onay", "Onay bekleyenler"], ["hepsi", "Tüm üyeler"]] as const;
 type Tab = (typeof TABS)[number][0];
 
 const EMPTY: Record<Tab, [string, string]> = {
-  onay: ["Onay bekleyen hesap yok", "Yeni kayıtlar burada görünür; onaylayınca yorum yazabilirler."],
-  basvuru: ["Bekleyen başvuru yok", "Yeni yazarlık başvuruları burada görünür."],
+  onay: ["Onay bekleyen hesap yok", "Yeni kayıtlar burada görünür. Onayladığın hesaplar yazı ve yorum paylaşabilir."],
   hepsi: ["Eşleşen üye yok", "Başka bir isim dene."],
 };
 
@@ -39,8 +38,7 @@ function MemberManager() {
 
   const list = state.status === "success" ? state.data : [];
   const byTab = useMemo(() => ({
-    onay: list.filter((m) => !m.approved),
-    basvuru: list.filter((m) => m.role === "pending"),
+    onay: list.filter((m) => m.role === "pending"),
     hepsi: list,
   }), [list]);
   const shown = useMemo(() => {
@@ -58,11 +56,7 @@ function MemberManager() {
     catch (err) { setState({ status: "success", data: before }); toast("error", "Güncellenemedi: " + (err as Error).message); }
     finally { setBusyId(""); }
   }
-  // Yazar ve admin her zaman onaylıdır (veritabanı da böyle yapar).
-  const change = (m: Profile, role: Role, done: string) =>
-    update(m, canWrite(role) ? { role, approved: true } : { role }, () => setRole(m.id, role), done);
-  const approve = (m: Profile, approved: boolean) =>
-    update(m, { approved }, () => setApproved(m.id, approved), approved ? `${m.name || "Üye"} artık yorum yazabilir.` : "Onay kaldırıldı; yorum yazamaz.");
+  const change = (m: Profile, role: Role, done: string) => update(m, { role }, () => setRole(m.id, role), done);
 
   return (
     <>
@@ -87,25 +81,20 @@ function MemberManager() {
               {shown.map((m) => (
                 <li key={m.id} className="row">
                   <Avatar person={m} size={40} />
-                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"} {!m.approved && <span className="badge badge-amber">onay bekliyor</span>}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
+                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"} {!canWrite(m.role) && <span className="badge badge-amber">onay bekliyor</span>}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
                   {m.role === "pending" ? (
-                    <>
-                      <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => change(m, "author", `${m.name} artık yazar.`)}><Icon name="pen" /> Yazar yap</button>
-                      <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => change(m, "reader", "Yazarlık başvurusu reddedildi; okur olarak devam ediyor.")}>Başvuruyu reddet</button>
-                    </>
+                    <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id}
+                      onClick={() => change(m, "author", `${m.name || "Üye"} onaylandı; artık yazı ve yorum paylaşabilir.`)}><Icon name="check" /> Hesabı onayla</button>
                   ) : (
                     <>
                       <label className="sr-only" htmlFor={`role-${m.id}`}>{m.name} rolü</label>
                       <select id={`role-${m.id}`} className="input role-select" value={m.role} disabled={m.id === me.id || busyId === m.id}
                         title={m.id === me.id ? "Kendi rolünü değiştiremezsin" : undefined}
-                        onChange={(e) => change(m, e.target.value as Role, "Rol güncellendi.")}>
+                        onChange={(e) => change(m, e.target.value as Role, e.target.value === "pending" ? "Onay kaldırıldı; artık yalnızca okuyabilir." : "Rol güncellendi.")}>
                         {(Object.keys(ROLE_LABEL) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
                       </select>
                     </>
                   )}
-                  {!canWrite(m.role) && (m.approved
-                    ? <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => approve(m, false)}>Onayı kaldır</button>
-                    : <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => approve(m, true)}><Icon name="check" /> Hesabı onayla</button>)}
                   {m.id !== me.id && <PasswordReset member={m} />}
                 </li>
               ))}
@@ -171,7 +160,7 @@ function AddAuthor({ onAdded }: { onAdded: () => void }) {
     setBusy(true);
     try {
       await createAuthor({ name: f.name.trim(), email: f.email.trim(), password: f.password });
-      toast("success", `${f.name.trim()} yazar olarak eklendi. E-postayı ve şifreyi kendisine ilet.`);
+      toast("success", `${f.name.trim()} onaylı üye olarak eklendi. E-postayı ve şifreyi kendisine ilet.`);
       setF({ name: "", email: "", password: "" });
       onAdded();
     } catch (err) {
@@ -183,8 +172,8 @@ function AddAuthor({ onAdded }: { onAdded: () => void }) {
 
   return (
     <form className="card panel-section" onSubmit={submit} noValidate>
-      <PanelHead title="Yazar ekle" />
-      <p className="muted" style={{ marginBottom: 16 }}>Hesap hemen açılır. Geçici şifreyi yazara sen ilet; Hesabım sayfasından değiştirebilir. Kullanım koşullarını da ilet: yazar, yazı yayınlayarak içerikten yalnızca kendisinin sorumlu olduğunu kabul eder.</p>
+      <PanelHead title="Onaylı üye ekle" />
+      <p className="muted" style={{ marginBottom: 16 }}>Hesap onaylı açılır: hemen yazı ve yorum paylaşabilir. Geçici şifreyi sen ilet; Hesabım sayfasından değiştirebilir. Kullanım koşullarını da ilet: paylaştığı içerikten yalnızca kendisi sorumludur.</p>
       <div className="grid-2">
         <label className="field"><span>Ad</span><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={80} /></label>
         <label className="field"><span>E-posta</span><input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></label>
@@ -197,7 +186,7 @@ function AddAuthor({ onAdded }: { onAdded: () => void }) {
         </div>
       </label>
       {error && <p className="form-error" role="alert">{error}</p>}
-      <button className="btn btn-primary" disabled={busy}>{busy ? "Ekleniyor…" : "Yazarı ekle"}</button>
+      <button className="btn btn-primary" disabled={busy}>{busy ? "Ekleniyor…" : "Üyeyi ekle"}</button>
     </form>
   );
 }

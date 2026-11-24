@@ -27,7 +27,7 @@ export default function Terms() {
         </p>
 
         <p>
-          Yorum ve yazı yalnızca <strong>yönetimin onayladığı hesaplardan</strong> paylaşılabilir. Onay, içeriğin
+          Yazı, yorum, beğeni ve diğer etkileşimler yalnızca <strong>yönetimin onayladığı hesaplardan</strong> yapılabilir; diğer ziyaretçiler yalnızca okuyabilir. Onay, içeriğin
           yönetimce incelendiği ya da benimsendiği anlamına gelmez; sorumluluk yine paylaşan üyededir.
         </p>
 
