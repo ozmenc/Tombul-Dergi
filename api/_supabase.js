@@ -1,4 +1,5 @@
 // Vercel fonksiyonları için ortak Supabase yardımcıları (alt çizgiyle başlayan dosya fonksiyon olarak yayınlanmaz).
+import { createHmac } from "node:crypto";
 const SB_URL = process.env.SUPABASE_URL;
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -21,6 +22,24 @@ export async function caller(req) {
 }
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const SIGNUPS_PER_HOUR = 5;
+
+/**
+ * Aynı IP'den saatte en fazla SIGNUPS_PER_HOUR kayıt denemesi (supabase/012_signup_limit.sql).
+ * IP düz saklanmaz: servis anahtarıyla HMAC-SHA256 özeti. Bir günden eski denemeler silinir. Sınır aşıldıysa false.
+ */
+export async function allowSignup(req) {
+  const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "").split(",")[0].trim() || "bilinmiyor";
+  const ipHash = createHmac("sha256", KEY).update(ip).digest("hex");
+  const hourAgo = new Date(Date.now() - 3600e3).toISOString();
+  const recent = await sb(`/rest/v1/signup_attempts?ip_hash=eq.${ipHash}&created_at=gte.${hourAgo}&select=ip_hash`, { headers: { Prefer: "count=exact", Range: "0-0" } });
+  const total = Number((recent.headers.get("content-range") || "*/0").split("/")[1]);
+  if (total >= SIGNUPS_PER_HOUR) return false;
+  await sb("/rest/v1/signup_attempts", { method: "POST", body: JSON.stringify({ ip_hash: ipHash }) });
+  await sb(`/rest/v1/signup_attempts?created_at=lt.${new Date(Date.now() - 86400e3).toISOString()}`, { method: "DELETE" });
+  return true;
+}
 
 /** Doğrulanmış (e-posta onayı gerekmeyen) hesap açar; çakışmada 409. */
 // Kullanım koşulları sürümü (src/pages/Terms.tsx "Son güncelleme"); kabul tarihiyle hesaba yazılır.

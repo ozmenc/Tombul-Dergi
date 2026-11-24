@@ -31,7 +31,7 @@ Giriş yapmamış ziyaretçiler yalnızca okur. Yetkiler tarayıcıda değil, Su
 
 ## Sunucu fonksiyonları (`api/`)
 
-- `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı alanı var.
+- `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı ve IP başına saatte 5 deneme sınırı var.
 - `authors.js`: admin onaylı üye hesabı açar.
 - `password.js`: admin bir üyeye yeni geçici şifre üretir (e-posta ulaşmazsa yedek yol).
 - `_supabase.js`: fonksiyonların ortak yardımcıları (fonksiyon olarak yayınlanmaz).
@@ -51,7 +51,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`, `010_magazine.sql`, `011_profiles_privacy.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`, `010_magazine.sql`, `011_profiles_privacy.sql`, `012_signup_limit.sql`.
 Dosyalar tarih sırasıyla birikmiş değişikliklerdir; son durum: dergi düzeni, yorum ve beğeni yok, yazı için admin onayı.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
