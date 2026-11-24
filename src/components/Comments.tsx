@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { addComment, deleteComment, listComments, setCommentHidden } from "../lib/api/comments";
 import { useAsync } from "../lib/useAsync";
@@ -88,11 +88,13 @@ function Composer({ me, postId, parentId, onAdded, autoFocus, onCancel }: Compos
   const toast = useToast();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const sending = useRef(false); // Ctrl+Enter düğmeyi atlar; state ikinci basışı aynı anda göremez
   const over = text.length > MAX;
 
   async function submit(e: FormEvent | React.KeyboardEvent) {
     e.preventDefault();
-    if (!text.trim() || over) return;
+    if (sending.current || !text.trim() || over) return;
+    sending.current = true;
     setBusy(true);
     try {
       onAdded(await addComment(postId, me, text, parentId));
@@ -101,6 +103,7 @@ function Composer({ me, postId, parentId, onAdded, autoFocus, onCancel }: Compos
     } catch {
       toast("error", "Yorum gönderilemedi. Tekrar dene.");
     } finally {
+      sending.current = false;
       setBusy(false);
     }
   }
