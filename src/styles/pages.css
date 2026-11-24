@@ -12,6 +12,8 @@
 .prose h3 { font-size: 21px; }
 .prose a { text-decoration: underline; text-underline-offset: 3px; }
 .prose img { border-radius: var(--r-card); margin: 1.4em 0; }
+.prose img.img-m { display: block; width: 60%; margin-inline: auto; }
+.prose img.img-s { display: block; width: 36%; min-width: 160px; margin-inline: auto; }
 .prose blockquote { border-left: 4px solid var(--amber); padding: 4px 0 4px 18px; font-style: italic; color: var(--muted); }
 .prose ul, .prose ol { padding-left: 1.3em; }
 .prose code { font-family: ui-monospace, Menlo, monospace; font-size: 0.85em; background: var(--surface-2); padding: 2px 6px; border-radius: var(--r-field); }
