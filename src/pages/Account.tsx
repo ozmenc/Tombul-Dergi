@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router";
 import { updateProfile } from "../lib/api/people";
-import { IMAGE_TYPES, uploadImage } from "../lib/api/storage";
+import { uploadImage } from "../lib/api/storage";
 import { supabase } from "../lib/supabase";
 import { signOut, useAuth } from "../lib/auth";
 import { fmtDate } from "../lib/format";
@@ -41,7 +41,7 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
     if (!file) return;
     setUploading(true);
     try {
-      const url = await uploadImage(file, me.id);
+      const url = await uploadImage(file, me.id, 512); // profil fotoğrafı küçük görünür
       setProfile((p) => ({ ...p, avatar_url: url }));
       toast("success", "Fotoğraf yüklendi. Kaydetmeyi unutma.");
     }
@@ -83,7 +83,7 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
             {canWrite(me.role) ? (
               <label className="btn">
                 {uploading ? "Yükleniyor…" : "Fotoğraf seç"}
-                <input type="file" accept={IMAGE_TYPES.join(",")} className="sr-only" disabled={uploading} onChange={onAvatar} />
+                <input type="file" accept="image/*" className="sr-only" disabled={uploading} onChange={onAvatar} />
               </label>
             ) : <span className="help">Hesabın onaylanınca fotoğraf yükleyebilirsin.</span>}
             {profile.avatar_url && <button type="button" className="linkish" onClick={() => setProfile((p) => ({ ...p, avatar_url: "" }))}>Fotoğrafı kaldır</button>}

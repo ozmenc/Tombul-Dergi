@@ -3,7 +3,7 @@ import { getPublished, listRelated } from "../lib/api/posts";
 import { useAsync } from "../lib/useAsync";
 import { useTitle } from "../lib/useTitle";
 import { renderMarkdown } from "../lib/markdown";
-import { fmtDate, readingMinutes } from "../lib/format";
+import { fmtDate, fmtRelative, readingMinutes } from "../lib/format";
 import type { ListedPost } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { ShareButton } from "../components/Actions";
@@ -44,7 +44,7 @@ function Article({ post }: { post: ListedPost }) {
             <Link to={`/yazar/${post.author.id}`} tabIndex={-1} aria-hidden="true"><Avatar person={post.author} size={48} /></Link>
             <div className="who">
               <Link to={`/yazar/${post.author.id}`}>{post.author.name || "İsimsiz yazar"}</Link>
-              <small>{fmtDate(post.published_at)} · {readingMinutes(post.content)} dk okuma</small>
+              <small><time dateTime={post.published_at ?? undefined} title={fmtDate(post.published_at)}>{fmtRelative(post.published_at)}</time> · {readingMinutes(post.content)} dk okuma</small>
             </div>
           </div>
         )}

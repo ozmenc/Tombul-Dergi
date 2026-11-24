@@ -4,7 +4,7 @@ export const fmtDate = (d: string | null | undefined) => {
   return isNaN(+x) ? "" : x.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
 };
 
-/** "şimdi", "5 dk önce", "3 sa önce", "2 gün önce", sonra tarih. */
+/** "şimdi", "5 dk önce", "3 sa önce", "2 gün önce", "3 hf önce", "4 ay önce", "2 yıl önce". */
 export function fmtRelative(d: string | null | undefined, now = Date.now()) {
   if (!d) return "";
   const t = new Date(d).getTime();
@@ -13,8 +13,11 @@ export function fmtRelative(d: string | null | undefined, now = Date.now()) {
   if (s < 60) return "şimdi";
   if (s < 3600) return `${Math.floor(s / 60)} dk önce`;
   if (s < 86400) return `${Math.floor(s / 3600)} sa önce`;
-  if (s < 7 * 86400) return `${Math.floor(s / 86400)} gün önce`;
-  return new Date(t).toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+  const days = Math.floor(s / 86400);
+  if (days < 7) return `${days} gün önce`;
+  if (days < 30) return `${Math.floor(days / 7)} hf önce`;
+  if (days < 365) return `${Math.floor(days / 30)} ay önce`;
+  return `${Math.floor(days / 365)} yıl önce`;
 }
 
 /** Markdown'ı kaba hatlarıyla düz metne çevirir (özet ve okuma süresi için). */

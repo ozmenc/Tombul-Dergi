@@ -20,6 +20,7 @@ const PATHS = {
   image: "M3 5h18v14H3zM8.5 10a1.5 1.5 0 1 0 0-.01M21 16l-5-5-9 8",
   check: "M5 12l5 5L20 7",
   flag: "M5 21V4M5 4h11l-2 4 2 4H5",
+  expand: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
 } as const;
 

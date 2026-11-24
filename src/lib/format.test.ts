@@ -54,6 +54,9 @@ describe("metin yardımcıları", () => {
     expect(fmtRelative("2026-11-24T11:15:00Z", now)).toBe("45 dk önce");
     expect(fmtRelative("2026-11-24T09:00:00Z", now)).toBe("3 sa önce");
     expect(fmtRelative("2026-11-22T12:00:00Z", now)).toBe("2 gün önce");
+    expect(fmtRelative("2026-11-03T12:00:00Z", now)).toBe("3 hf önce");
+    expect(fmtRelative("2026-07-24T12:00:00Z", now)).toBe("4 ay önce");
+    expect(fmtRelative("2024-11-01T12:00:00Z", now)).toBe("2 yıl önce");
     expect(fmtRelative("bozuk", now)).toBe("");
   });
 });

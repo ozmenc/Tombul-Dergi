@@ -12,6 +12,9 @@
 - **Hesabım** (`/hesap`): profil, fotoğraf, şifre, üyelik durumu. Ad 30 günde bir değişir (admin hariç).
 - **Panel** (`/panel`, onaylı üye ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak,
   resim boyutu: `![](url "küçük")` / `"orta"`). Öne çıkarma yalnızca admin.
+  Editörde biçim çubuğu ve kısayollar (⌘B/⌘I/⌘K, ⌘S kaydet), Enter ile liste sürdürme, resim yapıştırma ve
+  sürükle-bırak, odak modu ve tarayıcıda yerel yedek (`src/lib/mdEdit.ts`). Resimler yüklenmeden önce tarayıcıda
+  en fazla 2000 px'e küçültülüp WebP'ye (Safari'de JPEG) çevrilir; EXIF/konum bilgisi silinir (`src/lib/api/storage.ts`).
   Admin ayrıca kategorileri, üyeleri (e-postalar, hesap onayı, roller, onaylı üye ekleme, şifre sıfırlama) ve bildirimleri yönetir.
 - **Hukuki koruma**: `/kosullar` (kullanım koşulları ve sorumluluk reddi, 5651 yer sağlayıcı); kayıtta zorunlu onay
   (sürüm ve tarih hesabın `user_metadata`sına yazılır); yazı altında ve editörde sorumluluk notu;
