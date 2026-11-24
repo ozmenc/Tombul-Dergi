@@ -1,0 +1,145 @@
+import { useMemo, useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router";
+import { AdminOnly, PanelHead, usePanel } from "./PanelLayout";
+import { createAuthor, listMembers, setRole } from "../../lib/api/people";
+import { useAsync } from "../../lib/useAsync";
+import { useTitle } from "../../lib/useTitle";
+import { EMAIL_RE, fmtRelative } from "../../lib/format";
+import { ROLE_LABEL, type Profile, type Role } from "../../lib/types";
+import { Avatar } from "../../components/Avatar";
+import { Icon } from "../../components/Icon";
+import { EmptyState, ErrorState, ListSkeleton } from "../../components/States";
+import { useToast } from "../../components/Toast";
+
+export default function Members() {
+  useTitle("Üyeler");
+  return <AdminOnly><MemberManager /></AdminOnly>;
+}
+
+const TABS = [["basvuru", "Başvurular"], ["hepsi", "Tüm üyeler"]] as const;
+
+function MemberManager() {
+  const { me } = usePanel();
+  const toast = useToast();
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("sekme") === "basvuru" ? "basvuru" : "hepsi";
+  const [q, setQ] = useState("");
+  const [state, retry, setState] = useAsync(listMembers, []);
+  const [busyId, setBusyId] = useState("");
+
+  const list = state.status === "success" ? state.data : [];
+  const pending = list.filter((m) => m.role === "pending");
+  const shown = useMemo(() => {
+    const term = q.trim().toLocaleLowerCase("tr-TR");
+    return (tab === "basvuru" ? pending : list).filter((m) => !term || m.name.toLocaleLowerCase("tr-TR").includes(term));
+  }, [list, pending, tab, q]);
+
+  async function change(m: Profile, role: Role, done: string) {
+    if (state.status !== "success") return;
+    const before = state.data;
+    setBusyId(m.id);
+    setState({ status: "success", data: before.map((x) => (x.id === m.id ? { ...x, role } : x)) });
+    try { await setRole(m.id, role); toast("success", done); }
+    catch (err) { setState({ status: "success", data: before }); toast("error", "Rol değiştirilemedi: " + (err as Error).message); }
+    finally { setBusyId(""); }
+  }
+
+  return (
+    <>
+      <section className="card panel-section">
+        <PanelHead title="Üyeler" />
+        <div className="toolbar">
+          <div className="segmented" role="group" aria-label="Üye listesi">
+            {TABS.map(([k, label]) => (
+              <button key={k} type="button" aria-pressed={tab === k} onClick={() => setParams(k === "hepsi" ? {} : { sekme: k }, { replace: true })}>
+                {label} <span>{k === "basvuru" ? pending.length : list.length}</span>
+              </button>
+            ))}
+          </div>
+          <label className="search-mini"><Icon name="search" /><span className="sr-only">İsimde ara</span><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="İsimde ara" /></label>
+        </div>
+        {state.status === "loading" && <ListSkeleton rows={4} />}
+        {state.status === "error" && <ErrorState title="Üyeler yüklenemedi" error={state.error} onRetry={retry} />}
+        {state.status === "success" && (shown.length === 0
+          ? <EmptyState card={false} title={tab === "basvuru" ? "Bekleyen başvuru yok" : "Eşleşen üye yok"}>{tab === "basvuru" ? "Yeni yazarlık başvuruları burada görünür." : "Başka bir isim dene."}</EmptyState>
+          : (
+            <ul className="rows">
+              {shown.map((m) => (
+                <li key={m.id} className="row">
+                  <Avatar person={m} size={40} />
+                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"}</strong><small>{fmtRelative(m.created_at)} katıldı</small></span>
+                  {m.role === "pending" ? (
+                    <>
+                      <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => change(m, "author", `${m.name} artık yazar.`)}><Icon name="check" /> Onayla</button>
+                      <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => change(m, "reader", "Başvuru reddedildi; okur olarak devam ediyor.")}>Reddet</button>
+                    </>
+                  ) : (
+                    <>
+                      <label className="sr-only" htmlFor={`role-${m.id}`}>{m.name} rolü</label>
+                      <select id={`role-${m.id}`} className="input role-select" value={m.role} disabled={m.id === me.id || busyId === m.id}
+                        title={m.id === me.id ? "Kendi rolünü değiştiremezsin" : undefined}
+                        onChange={(e) => change(m, e.target.value as Role, "Rol güncellendi.")}>
+                        {(Object.keys(ROLE_LABEL) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
+                      </select>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ))}
+      </section>
+      <AddAuthor onAdded={retry} />
+    </>
+  );
+}
+
+function AddAuthor({ onAdded }: { onAdded: () => void }) {
+  const toast = useToast();
+  const [f, setF] = useState({ name: "", email: "", password: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const generate = () => {
+    const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    setF((x) => ({ ...x, password: Array.from(crypto.getRandomValues(new Uint32Array(14)), (n) => chars[n % chars.length]).join("") }));
+  };
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!f.name.trim()) return setError("Yazarın adını yaz.");
+    if (!EMAIL_RE.test(f.email.trim())) return setError("Geçerli bir e-posta yaz.");
+    if (f.password.length < 8) return setError("Şifre en az 8 karakter olmalı.");
+    setError("");
+    setBusy(true);
+    try {
+      await createAuthor({ name: f.name.trim(), email: f.email.trim(), password: f.password });
+      toast("success", `${f.name.trim()} yazar olarak eklendi. E-postayı ve şifreyi kendisine ilet.`);
+      setF({ name: "", email: "", password: "" });
+      onAdded();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="card panel-section" onSubmit={submit} noValidate>
+      <PanelHead title="Yazar ekle" />
+      <p className="muted" style={{ marginBottom: 16 }}>Hesap hemen açılır. Geçici şifreyi yazara sen ilet; Hesabım sayfasından değiştirebilir.</p>
+      <div className="grid-2">
+        <label className="field"><span>Ad</span><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={80} /></label>
+        <label className="field"><span>E-posta</span><input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></label>
+      </div>
+      <label className="field">
+        <span>Geçici şifre</span>
+        <div className="inline-form">
+          <input className="input" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} autoComplete="off" />
+          <button type="button" className="btn" onClick={generate}>Şifre üret</button>
+        </div>
+      </label>
+      {error && <p className="form-error" role="alert">{error}</p>}
+      <button className="btn btn-primary" disabled={busy}>{busy ? "Ekleniyor…" : "Yazarı ekle"}</button>
+    </form>
+  );
+}

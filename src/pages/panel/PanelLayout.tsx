@@ -1,10 +1,11 @@
-import { Navigate, NavLink, Outlet, useLocation, useOutletContext } from "react-router";
-import { signOut, useAuth } from "../../lib/auth";
-import type { Profile } from "../../lib/types";
-import { ErrorState, Spinner } from "../../components/States";
-import { Mascot } from "../../components/Mascot";
+import type { ReactNode } from "react";
+import { Link, Navigate, NavLink, Outlet, useLocation, useOutletContext } from "react-router";
+import { useAuth } from "../../lib/auth";
+import { canWrite, type Profile } from "../../lib/types";
+import { ErrorState, Forbidden, Spinner } from "../../components/States";
+import { Icon } from "../../components/Icon";
 
-type PanelCtx = { me: Profile; refresh: () => Promise<void> };
+type PanelCtx = { me: Profile };
 export const usePanel = () => useOutletContext<PanelCtx>();
 
 export default function PanelLayout() {
@@ -12,33 +13,46 @@ export default function PanelLayout() {
   const { pathname } = useLocation();
 
   if (auth.status === "loading") return <Spinner />;
-  if (auth.status === "error") return <div className="page"><ErrorState title="Hesabın yüklenemedi" onRetry={auth.retry} /></div>;
+  if (auth.status === "error") return <ErrorState title="Hesabın yüklenemedi" onRetry={auth.retry} />;
   if (auth.status === "signed-out") return <Navigate to={`/giris?next=${encodeURIComponent(pathname)}`} replace />;
 
   const me = auth.profile;
-  if (me.role === "pending") {
+  if (!canWrite(me.role))
     return (
-      <section className="state page">
-        <Mascot kind="planet" size={140} />
-        <h1>Hesabın onay bekliyor</h1>
-        <p>Bir admin seni yazar yaptığında buradan yazmaya başlayabilirsin.</p>
-        <button className="btn" onClick={() => signOut()}>Çıkış yap</button>
-      </section>
+      <Forbidden>
+        {me.role === "pending" ? "Yazarlık başvurun inceleniyor. Onaylanınca panelin açılacak." : "Panel yazarlar için. Yazmak istersen başvurabilirsin."}
+        <br /><Link to="/hesap#yazarlik">Başvuru durumuna bak</Link>
+      </Forbidden>
     );
-  }
 
   return (
-    <div className="panel">
-      <aside className="panel-nav" aria-label="Panel">
-        <p className="panel-me"><strong>{me.name || "İsimsiz"}</strong><span>{me.role === "admin" ? "Admin" : "Yazar"}</span></p>
-        <NavLink to="/panel" end>Yazılar</NavLink>
-        {me.role === "admin" && <NavLink to="/panel/yazarlar">Yazarlar</NavLink>}
-        <NavLink to="/panel/profil">Profilim</NavLink>
-        <button className="linkish" onClick={() => signOut()}>Çıkış yap</button>
-      </aside>
-      <div className="panel-main">
-        <Outlet context={{ me, refresh: auth.refresh } satisfies PanelCtx} />
+    <>
+      <div className="panel-top">
+        <nav className="segmented" aria-label="Panel">
+          <NavLink to="/panel" end>Genel bakış</NavLink>
+          <NavLink to="/panel/yazilar">Yazılar</NavLink>
+          {me.role === "admin" && <NavLink to="/panel/kategoriler">Kategoriler</NavLink>}
+          {me.role === "admin" && <NavLink to="/panel/uyeler">Üyeler</NavLink>}
+          {me.role === "admin" && <NavLink to="/panel/yorumlar">Yorumlar</NavLink>}
+        </nav>
+        <Link to="/panel/yeni" className="btn btn-primary"><Icon name="plus" /> Yeni yazı</Link>
       </div>
+      <Outlet context={{ me } satisfies PanelCtx} />
+    </>
+  );
+}
+
+/** Sadece adminlerin göreceği panel sayfaları için. */
+export function AdminOnly({ children }: { children: ReactNode }) {
+  const { me } = usePanel();
+  return me.role === "admin" ? <>{children}</> : <Forbidden>Bu bölüm sadece adminler için.</Forbidden>;
+}
+
+export function PanelHead({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <div className="panel-head">
+      <h1>{title}</h1>
+      {children}
     </div>
   );
 }

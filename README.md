@@ -1,36 +1,56 @@
 # Tombul Dergi
 
-Üniversitelilerin her şey hakkında yazdığı dergi. Vite + React + TypeScript, Supabase (veritabanı, giriş, resimler), Vercel.
+Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritabanı, giriş, resimler), Vercel.
 
-Görünüm 1950'ler atom çağı karikatürü: aydınlık ve koyu tema, canvas'ta çizilen 2D maskotlar (Tombul, Atomcuk, Fokur, Halka, Mercek, Füze). Çizim motoru (`src/toon/toon.ts`) [Lemo-Opuscar](https://github.com/lemomo-ai/lemo-opuscar)'ın Mid-century Cartoon demo motorundan uyarlandı (Lemo-Opuscar by Lemomo (LemoLab), MIT).
+## Neler var
 
-## Nasıl çalışır
+- **Akış** (`/`): yazar halkaları, "Senin için / Takip ettiklerin / Popüler", kategori filtresi.
+- **Keşfet** (`/kesfet?q=…&kategori=…&etiket=…`): yazı ve yazar araması, kategoriler, etiketler.
+- **Yazı** (`/yazi/:slug`): Markdown metin, beğen / beğenme, kaydet, paylaş, yorumlar ve yanıtlar, sıradaki yazılar.
+- **Yazarlar** (`/yazarlar`, `/yazar/:id`): takip et, takipçi ve yazı sayıları.
+- **Kaydettiklerim** (`/kaydedilenler`), **Hesabım** (`/hesap`): profil, fotoğraf, şifre, yazarlık başvurusu.
+- **Giriş / kayıt** (`/giris`, `/kayit`): kayıtta "yazar olmak istiyorum" seçilebilir.
+- **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, öne çıkarma).
+  Admin ayrıca kategorileri, üyeleri (başvuru onayı, roller, yazar ekleme) ve yorumları (gizle / sil) yönetir.
+- Aydınlık ve koyu tema; her sayfada yükleniyor, boş, hata ve 404 durumları.
+- Maskot: `src/components/Bottle.tsx` (gözleri imleci izler; sevinç, üzgün, utangaç, dolum, devrik halleri).
 
-- **Site** (`/`, `/yazi/:slug`, `/yazarlar`, `/yazar/:id`): yayındaki yazıları herkes okur.
-- **Panel** (`/panel`): yazarlar e-posta ve şifreyle girer.
-  - **Yazar** kendi yazılarını yazar, düzenler, yayınlar ve siler.
-  - **Admin** tüm yazıları yönetir, yeni yazar ekler, rolleri değiştirir.
-  - "Durduruldu" (`pending`) hesap giriş yapabilir ama yazamaz.
-- Yetkiler tarayıcıda değil, Supabase'in RLS kurallarında: `supabase/schema.sql`.
-- Yazar hesabı açmak servis anahtarı gerektirdiği için `api/authors.js` (Vercel fonksiyonu) üzerinden yapılır.
-- Yazılar Markdown: `**kalın**`, `*eğik*`, `## başlık`, `> alıntı`, `[bağlantı](https://…)`, resimler panelden yüklenir.
+## Roller
+
+| Rol | Yapabilir |
+|---|---|
+| `reader` (okur) | yorum, beğen/beğenme, kaydet, takip; yazarlığa başvurur |
+| `pending` (başvuran) | okur gibi; admin onayını bekler |
+| `author` (yazar) | kendi yazılarını yazar, yayınlar, siler |
+| `admin` | her şey |
+
+Yetkiler tarayıcıda değil, Supabase RLS kurallarında (`supabase/*.sql`).
+
+## Sunucu fonksiyonları (`api/`)
+
+- `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı alanı var.
+- `authors.js`: admin yazar hesabı açar.
+- `_supabase.js`: ikisinin ortak yardımcıları (fonksiyon olarak yayınlanmaz).
 
 ## Geliştirme
 
 ```bash
 npm install
 vercel env pull .env.local   # Supabase değişkenleri
-npm run dev                  # arayüz (http://localhost:5173)
+npm run dev                  # arayüz
 npm test                     # birim testleri
 npm run build                # tip kontrolü + derleme
+npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'ten üretir
 ```
 
-`npm run dev` sadece arayüzü çalıştırır; panelde "Yazar ekle" `/api/authors` fonksiyonuna ihtiyaç duyar ve Vercel'de çalışır.
+`npm run dev` sadece arayüzü çalıştırır; kayıt ve yazar ekleme `api/` fonksiyonlarına ihtiyaç duyar ve Vercel'de çalışır.
+
+## Veritabanı
+
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`.
 
 ## Yayın
 
 `main` dalına her push Vercel'de otomatik yayınlanır.
 
-## Veritabanı
-
-Şema `supabase/schema.sql` dosyasında; boş bir Supabase projesine bir kez uygulanır.
+Logo etiket yazıları Fraunces (SIL Open Font License) ile çizilip path'e çevrildi.

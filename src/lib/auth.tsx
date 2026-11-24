@@ -1,42 +1,45 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
-import { getProfile } from "./api";
+import { getProfile } from "./api/people";
 import type { Profile } from "./types";
 
-type Auth =
+export type Auth =
   | { status: "loading" }
   | { status: "signed-out" }
   | { status: "error"; retry: () => void }
-  | { status: "signed-in"; session: Session; profile: Profile; refresh: () => Promise<void> };
+  | { status: "signed-in"; profile: Profile; refresh: () => Promise<void> };
 
 const Ctx = createContext<Auth>({ status: "loading" });
 export const useAuth = () => useContext(Ctx);
 
+/** Giriş yapmış kullanıcının profili ya da null. */
+export const useMe = () => {
+  const a = useAuth();
+  return a.status === "signed-in" ? a.profile : null;
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<Auth>({ status: "loading" });
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const userId = session?.user.id;
+  // undefined: henüz bilinmiyor, null: oturum yok. Token yenilemesi kimliği değiştirmez, profil yeniden çekilmez.
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => setUserId(s?.user.id ?? null));
     return () => data.subscription.unsubscribe();
   }, []);
 
   const load = useCallback(async (silent = false) => {
-    if (session === undefined) return;
-    if (!session) return setAuth({ status: "signed-out" });
+    if (userId === undefined) return;
+    if (userId === null) return setAuth({ status: "signed-out" });
     if (!silent) setAuth({ status: "loading" });
     try {
-      const profile = await getProfile(session.user.id);
-      if (!profile) { await supabase.auth.signOut(); return; } // hesabı silinmiş
-      setAuth({ status: "signed-in", session, profile, refresh: () => load(true) });
+      const profile = await getProfile(userId);
+      if (!profile) { await supabase.auth.signOut(); return; } // hesap silinmiş
+      setAuth({ status: "signed-in", profile, refresh: () => load(true) });
     } catch {
       setAuth({ status: "error", retry: () => void load() });
     }
-    // token yenilemesinde profili yeniden çekme: sadece kullanıcı değişince
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, session === null, session === undefined]);
+  }, [userId]);
 
   useEffect(() => { void load(); }, [load]);
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { excerpt, plainText, readingMinutes, slugify, SLUG_RE, initials } from "./format";
+import { excerpt, fmtRelative, initials, normalizeTag, parseTags, plainText, popularity, readingMinutes, sanitizeSearch, slugify, SLUG_RE } from "./format";
 
 describe("slugify", () => {
   it("Türkçe karakterleri sadeleştirir", () => {
@@ -11,6 +11,24 @@ describe("slugify", () => {
       const out = slugify(s);
       expect(out === "" || SLUG_RE.test(out)).toBe(true);
     }
+  });
+});
+
+describe("etiketler", () => {
+  it("normalleştirir ve Türkçe harfleri korur", () => {
+    expect(normalizeTag("  #Şehir Notları ")).toBe("şehir-notları");
+    expect(normalizeTag("###")).toBe("");
+  });
+  it("virgülle ayrılmış girişi tekrarsız ve en fazla 8 etikete çevirir", () => {
+    expect(parseTags("müzik, Müzik, gece,, ")).toEqual(["müzik", "gece"]);
+    expect(parseTags("a,b,c,d,e,f,g,h,i,j")).toHaveLength(8);
+  });
+});
+
+describe("arama", () => {
+  it("PostgREST filtresini bozacak karakterleri atar", () => {
+    expect(sanitizeSearch("kahve, (sıcak)*%")).toBe("kahve sıcak");
+    expect(sanitizeSearch("   ")).toBe("");
   });
 });
 
@@ -29,5 +47,16 @@ describe("metin yardımcıları", () => {
   it("baş harfler", () => {
     expect(initials("ilknur özmen")).toBe("İÖ");
     expect(initials("  ")).toBe("?");
+  });
+  it("göreli zaman", () => {
+    const now = Date.parse("2026-11-24T12:00:00Z");
+    expect(fmtRelative("2026-11-24T11:59:30Z", now)).toBe("şimdi");
+    expect(fmtRelative("2026-11-24T11:15:00Z", now)).toBe("45 dk önce");
+    expect(fmtRelative("2026-11-24T09:00:00Z", now)).toBe("3 sa önce");
+    expect(fmtRelative("2026-11-22T12:00:00Z", now)).toBe("2 gün önce");
+    expect(fmtRelative("bozuk", now)).toBe("");
+  });
+  it("popülerlik beğenmemeyi cezalandırır", () => {
+    expect(popularity({ likes: 3, dislikes: 0, comments: 1 })).toBeGreaterThan(popularity({ likes: 3, dislikes: 4, comments: 1 }));
   });
 });

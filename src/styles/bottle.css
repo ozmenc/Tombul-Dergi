@@ -1,0 +1,67 @@
+/* Şişe karakteri ve animasyonları. Hareket azaltma tercihi base.css'te kapatılır. */
+.bottle { display: block; overflow: visible; }
+.bt-glass { fill: var(--glass); }
+.bt-beer { fill: var(--beer); }
+.bt-foam { fill: var(--foam); }
+.bt-outline { fill: none; stroke: #15183a; stroke-width: 2.6; stroke-linejoin: round; }
+.bt-shine { stroke: #fff; stroke-opacity: 0.55; stroke-width: 3; stroke-linecap: round; fill: none; }
+.bt-cap path, .bt-cap rect { fill: #2d5bff; stroke: #15183a; stroke-width: 2; stroke-linejoin: round; }
+.bt-label { fill: #2d5bff; stroke: #dfe4f2; stroke-width: 2; }
+.bt-label-text { fill: #fff8ea; font: 900 9.5px var(--font); letter-spacing: 0.04em; }
+.bt-eye { fill: #fff; stroke: #15183a; stroke-width: 1.6; }
+.bt-pupil { fill: #15183a; }
+.bt-glint { fill: #fff; }
+.bt-closed, .bt-brow { fill: none; stroke: #15183a; stroke-width: 2; stroke-linecap: round; }
+.bt-cheek { fill: #ff7aa8; opacity: 0.45; }
+.bt-mouth { fill: none; stroke: #15183a; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.bt-mouth.open { fill: #8c2f3c; }
+.bottle-lost .bt-mouth { fill: #15183a; }
+.bt-shadow { fill: #15183a; opacity: 0.12; }
+.bt-puddle { fill: var(--beer); opacity: 0.55; }
+.bt-bub { fill: #fff; opacity: 0; }
+
+.bt-body, .bt-eyes, .bt-liquid, .bt-bub, .bt-foam { transform-box: fill-box; }
+.bt-body { transform-origin: 50% 100%; }
+
+/* hep canlı: hafif sallanma, göz kırpma, kabarcıklar */
+.bottle-idle .bt-body, .bottle-happy .bt-body { animation: bt-bob 3.4s ease-in-out infinite; }
+.bt-eyes { transform-origin: 50% 50%; animation: bt-blink 5.2s infinite; }
+.bottle-idle .bt-bub, .bottle-happy .bt-bub, .bottle-filling .bt-bub { animation: bt-rise 2.8s linear infinite; }
+.bt-bub.b2 { animation-delay: 0.7s; } .bt-bub.b3 { animation-delay: 1.4s; } .bt-bub.b4 { animation-delay: 2.1s; }
+
+/* sevinç: zıplar, köpük taşar */
+.bottle-happy .bt-body { animation: bt-cheer 1.2s var(--ease-back) infinite; }
+.bottle-happy .bt-foam { animation: bt-foam 1.2s ease-in-out infinite; transform-origin: 50% 100%; }
+
+/* üzgün: eğik durur, yavaş göz kırpar */
+.bottle-sad .bt-body { transform: rotate(-5deg) translateY(2px); }
+.bottle-sad .bt-eyes { animation-duration: 7s; }
+.bottle-sad .bt-liquid { transform: translateY(46px); }
+
+/* yükleniyor: şişe dolar */
+.bottle-filling .bt-liquid { animation: bt-fill 1.8s ease-in-out infinite; }
+.bottle-filling .bt-body { animation: bt-bob 1.8s ease-in-out infinite; }
+
+/* kayıp (404): devrilmiş, birası dökülmüş */
+.bottle-lost .bt-liquid { transform: translateY(58px); }
+.bottle-lost .bt-puddle { animation: bt-puddle 3s ease-in-out infinite; transform-box: fill-box; transform-origin: 20% 50%; }
+
+/* utangaç (şifre yazılırken): gözlerini kapar, kızarır */
+.bottle-shy .bt-cheek { opacity: 0.8; }
+.bottle-shy .bt-body { transform: rotate(4deg); transition: transform 0.3s var(--ease-back); }
+
+/* dokununca */
+.bottle-hit { padding: 0; border: 0; background: none; border-radius: 30px; display: inline-flex; }
+.bottle-hit:hover .bt-body { animation: bt-wobble 0.7s var(--ease-out); }
+.popping .bt-body { animation: bt-jump 0.75s var(--ease-back); }
+.popping .bt-foam { animation: bt-foam 0.75s ease-out; transform-origin: 50% 100%; }
+
+@keyframes bt-bob { 50% { transform: translateY(-3px) rotate(-1.5deg); } }
+@keyframes bt-blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+@keyframes bt-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 0.85; } 85% { opacity: 0.6; } 100% { transform: translateY(-70px); opacity: 0; } }
+@keyframes bt-cheer { 0%, 100% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(-14px) scale(0.95, 1.06) rotate(-6deg); } 55% { transform: translateY(0) scale(1.06, 0.94); } 75% { transform: scale(0.98, 1.02) rotate(3deg); } }
+@keyframes bt-foam { 0%, 100% { transform: scaleY(1); } 40% { transform: translateY(-6px) scaleY(1.9); } }
+@keyframes bt-fill { 0% { transform: translateY(92px); } 70%, 100% { transform: translateY(0); } }
+@keyframes bt-puddle { 50% { transform: scaleX(1.15); } }
+@keyframes bt-wobble { 20% { transform: rotate(-8deg); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-3deg); } 100% { transform: none; } }
+@keyframes bt-jump { 0% { transform: scale(1.08, 0.9); } 35% { transform: translateY(-22%) scale(0.94, 1.08) rotate(-8deg); } 65% { transform: translateY(0) scale(1.08, 0.92); } 82% { transform: scale(0.97, 1.03); } 100% { transform: none; } }

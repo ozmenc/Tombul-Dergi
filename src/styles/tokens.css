@@ -1,0 +1,61 @@
+/* Tombul Dergi tasarım değişkenleri: amber şişe, kobalt etiket, okunaklı yüzeyler. */
+:root {
+  --bg: #f3f5fb;
+  --surface: #ffffff;
+  --surface-2: #f6f7fc;
+  --ink: #15183a;
+  --muted: #5d6288;
+  --line: #e4e7f2;
+  --primary: #2d5bff;
+  --primary-hover: #1f47e0;
+  --on-primary: #ffffff;
+  --amber: #ffaa2c;
+  --amber-soft: #fff1dc;
+  --amber-ink: #8a4b00;
+  --pink: #ff5fa2;
+  --pink-soft: #ffe3ef;
+  --mint: #22a876;
+  --mint-soft: #ddf6ea;
+  --danger: #d92c55;
+  --danger-soft: #ffe4ea;
+  --glass: #ffd796;
+  --beer: #f5a623;
+  --foam: #fff8ea;
+  --shadow: 0 1px 3px rgba(21, 24, 58, 0.06);
+  --shadow-lift: 0 14px 36px rgba(21, 24, 58, 0.12);
+
+  --font: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Literata", Georgia, "Times New Roman", serif;
+
+  --r-card: 28px;
+  --r-field: 16px;
+  --gutter: clamp(14px, 3vw, 28px);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-back: cubic-bezier(0.3, 1.6, 0.5, 1);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d1030;
+  --surface: #161a44;
+  --surface-2: #1d2252;
+  --ink: #eef0ff;
+  --muted: #a9aed8;
+  --line: #2b3066;
+  --primary: #7d97ff;
+  --primary-hover: #9aafff;
+  --on-primary: #0d1030;
+  --amber: #ffb547;
+  --amber-soft: #3a2c1a;
+  --amber-ink: #ffcf85;
+  --pink: #ff7ab3;
+  --pink-soft: #3d2040;
+  --mint: #4fd7a0;
+  --mint-soft: #173c38;
+  --danger: #ff7a95;
+  --danger-soft: #45203a;
+  --glass: #6b5426;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 14px 36px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}

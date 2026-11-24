@@ -1,0 +1,105 @@
+/* ---------- Avatar (hikâye halkası) ---------- */
+.avatar { position: relative; display: inline-grid; place-items: center; flex: none; border-radius: 50%; font-weight: 800; color: #15183a; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ring { display: inline-grid; place-items: center; border-radius: 50%; padding: 3px; background: conic-gradient(from 0deg, var(--amber), var(--pink), var(--primary), var(--amber)); flex: none; }
+.ring .avatar { box-shadow: 0 0 0 3px var(--bg); }
+.story { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ink); font-weight: 600; font-size: 13.5px; width: 78px; flex: none; text-align: center; }
+.story span:last-child { max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.story:hover { color: var(--ink); }
+.story:hover .ring { animation: ring-spin 1.2s linear; }
+.story-add .ring { background: none; border: 2px dashed var(--muted); padding: 1px; }
+.stories { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: none; }
+.stories::-webkit-scrollbar { display: none; }
+@keyframes ring-spin { to { filter: hue-rotate(360deg); } }
+
+/* ---------- Gönderi kartı ---------- */
+.post-card { background: var(--surface); border-radius: var(--r-card); padding: 20px 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; transition: box-shadow 0.2s, transform 0.2s var(--ease-out); }
+.post-card:hover { box-shadow: var(--shadow-lift); }
+.post-head { display: flex; align-items: center; gap: 12px; }
+.post-head .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.post-head .who a { color: var(--ink); font-weight: 700; }
+.post-head .who small { color: var(--muted); font-size: 14px; }
+.post-title { font-size: clamp(22px, 3.2vw, 30px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; }
+.post-title a { color: var(--ink); }
+.post-title a:hover { color: var(--primary); }
+.post-excerpt { font-family: var(--read); font-size: 17px; line-height: 1.6; color: var(--muted); }
+.post-cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 20px; }
+.post-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 480px) { .post-card .post-actions { flex-wrap: nowrap; gap: 6px; } .post-card .act { padding: 0 11px; } }
+.post-actions .spacer { flex: 1; }
+.featured-flag { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- Oy, kaydet, paylaş ---------- */
+.act { position: relative; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--surface-2); color: var(--ink); font-weight: 600; font-size: 14.5px; transition: background-color 0.15s, color 0.15s, transform 0.12s; }
+a.act { color: var(--ink); }
+.act:hover { background: var(--line); color: var(--ink); }
+.act:active { transform: scale(0.94); }
+.act .icon { width: 19px; height: 19px; }
+.act.like.on { background: var(--amber-soft); color: var(--amber-ink); }
+.act.dislike.on { background: var(--danger-soft); color: var(--danger); }
+.act.saved { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
+.act.like.on .icon { animation: pop 0.45s var(--ease-back); }
+.act.dislike.on .icon { animation: shake 0.4s ease-in-out; }
+.act.saved .icon { animation: pop 0.45s var(--ease-back); }
+.act-lg { min-height: 48px; padding: 0 18px; font-size: 15.5px; }
+.burst { position: absolute; left: 22px; top: 50%; pointer-events: none; }
+.burst i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); opacity: 0; animation: burst 0.7s var(--ease-out) forwards; }
+.burst i:nth-child(2n) { background: var(--foam); box-shadow: 0 0 0 1.5px var(--amber); }
+@keyframes pop { 0% { transform: scale(0.6); } 55% { transform: scale(1.35) rotate(-10deg); } 100% { transform: scale(1); } }
+@keyframes shake { 20%, 60% { transform: translateX(-3px) rotate(-6deg); } 40%, 80% { transform: translateX(3px) rotate(6deg); } }
+@keyframes burst { 0% { opacity: 1; transform: translate(0, 0) scale(0.6); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); } }
+
+/* ---------- Yorumlar ---------- */
+.comments { background: var(--surface); border-radius: var(--r-card); padding: clamp(18px, 3vw, 28px); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 20px; }
+.comments-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.comments-head h2 { flex: 1; font-size: 24px; }
+.composer { display: flex; gap: 12px; align-items: flex-start; }
+.composer form { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.composer textarea { width: 100%; min-height: 52px; max-height: 260px; padding: 13px 16px; border-radius: 22px; border: 1.5px solid var(--line); background: var(--surface-2); resize: vertical; line-height: 1.5; transition: min-height 0.2s var(--ease-out), border-color 0.15s; }
+.composer textarea:focus { outline: none; border-color: var(--primary); min-height: 96px; background: var(--surface); }
+.composer-foot { display: flex; align-items: center; gap: 10px; }
+.composer-foot small { flex: 1; color: var(--muted); }
+.composer-foot small.over { color: var(--danger); font-weight: 700; }
+.login-nudge { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; background: var(--surface-2); flex-wrap: wrap; }
+.login-nudge p { flex: 1 1 200px; color: var(--muted); }
+.comment { display: flex; gap: 12px; animation: comment-in 0.4s var(--ease-out); }
+.comment-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.comment-bubble { background: var(--surface-2); border-radius: 6px 20px 20px 20px; padding: 12px 16px; }
+.comment-meta { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.comment-meta strong { font-size: 15px; }
+.comment-meta small { color: var(--muted); }
+.comment-body { margin-top: 4px; font-size: 15.5px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment.hidden .comment-bubble { opacity: 0.55; border: 1.5px dashed var(--line); }
+.comment-actions { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.comment-actions .act { min-height: 34px; padding: 0 11px; font-size: 13.5px; background: transparent; }
+.comment-actions .act:hover { background: var(--surface-2); }
+.comment-actions .act.like.on { background: var(--amber-soft); }
+.comment-actions .act.dislike.on { background: var(--danger-soft); }
+.replies { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; padding-left: 14px; border-left: 2px solid var(--line); }
+.comment.fresh .comment-bubble { animation: fresh 1.6s ease-out; }
+@keyframes comment-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes fresh { 0% { background: var(--amber-soft); } 100% { background: var(--surface-2); } }
+
+/* ---------- Durumlar ---------- */
+.state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 40px 20px; }
+.state h1, .state h2 { font-size: 24px; }
+.state p { color: var(--muted); max-width: 44ch; }
+.state .btn { margin-top: 6px; }
+.state-card { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow); }
+.state-detail { font-size: 13px; opacity: 0.75; }
+.sk { background: linear-gradient(90deg, var(--surface-2) 0%, var(--line) 50%, var(--surface-2) 100%); background-size: 200% 100%; border-radius: 10px; animation: shimmer 1.3s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.sk-card { background: var(--surface); border-radius: var(--r-card); padding: 22px; box-shadow: var(--shadow); display: grid; gap: 12px; }
+.sk-row { display: flex; gap: 12px; align-items: center; }
+.sk-circle { width: 44px; height: 44px; border-radius: 50%; }
+.sk-line { height: 14px; width: 100%; }
+.sk-title { height: 28px; width: 70%; }
+.sk-short { width: 40%; }
+
+/* ---------- Bildirimler ---------- */
+.toasts { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: grid; gap: 8px; z-index: 80; width: min(92vw, 420px); }
+.toast { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-radius: 18px; background: var(--ink); color: var(--bg); font-weight: 600; box-shadow: var(--shadow-lift); animation: toast-in 0.35s var(--ease-back); }
+.toast a { color: var(--amber); text-decoration: underline; }
+.toast-error { background: var(--danger); color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(14px) scale(0.94); } }
+@media (max-width: 820px) { .toasts { bottom: 92px; } }

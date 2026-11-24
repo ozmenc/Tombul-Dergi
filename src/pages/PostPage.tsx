@@ -1,37 +1,80 @@
-import { Link, useParams } from "react-router";
+import { useCallback, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
+import { getPublished, listRelated } from "../lib/api/posts";
 import { useAsync } from "../lib/useAsync";
-import { getPublished } from "../lib/api";
 import { useTitle } from "../lib/useTitle";
 import { renderMarkdown } from "../lib/markdown";
-import { PostMeta } from "../components/PostItem";
+import { fmtDate, readingMinutes } from "../lib/format";
+import type { FeedPost } from "../lib/types";
 import { Avatar } from "../components/Avatar";
-import { ArticleSkeleton, ErrorState, NotFound } from "../components/States";
+import { FollowButton, SaveButton, ShareButton, VoteButtons } from "../components/Actions";
+import { Comments } from "../components/Comments";
+import { Icon } from "../components/Icon";
+import { PostCard } from "../components/PostCard";
+import { ErrorState, FeedSkeleton, NotFound } from "../components/States";
 
 export default function PostPage() {
   const { slug = "" } = useParams();
   const [state, retry] = useAsync(() => getPublished(slug), [slug]);
   useTitle(state.status === "success" ? state.data?.title ?? "Yazı bulunamadı" : undefined);
 
-  if (state.status === "loading") return <ArticleSkeleton />;
-  if (state.status === "error") return <div className="page"><ErrorState title="Yazı yüklenemedi" error={state.error} onRetry={retry} /></div>;
-  const post = state.data;
-  if (!post) return <NotFound title="Bu yazı bulunamadı">Yazı kaldırılmış ya da henüz yayımlanmamış olabilir.</NotFound>;
+  if (state.status === "loading") return <FeedSkeleton rows={1} />;
+  if (state.status === "error") return <ErrorState title="Yazı yüklenemedi" error={state.error} onRetry={retry} />;
+  if (!state.data) return <NotFound title="Bu yazı bulunamadı">Kaldırılmış ya da henüz yayımlanmamış olabilir.</NotFound>;
+  return <Article post={state.data} />;
+}
+
+function Article({ post }: { post: FeedPost }) {
+  const navigate = useNavigate();
+  const [comments, setComments] = useState(post.stats.comments);
+  const onCount = useCallback((n: number) => setComments(n), []);
+  const [related] = useAsync(() => listRelated(post), [post.id]);
+  const back = () => (history.length > 1 ? navigate(-1) : navigate("/"));
 
   return (
-    <article className="article-wrap">
-      <Link to="/" className="back">← Tüm yazılar</Link>
-      <div className="card article-card">
-      <h1 className="article-title">{post.title}</h1>
-      <PostMeta post={post} />
-      {post.cover && <img className="article-cover" src={post.cover} alt="" />}
-      <div className="prose" dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
-      {post.author && (
-        <Link to={`/yazar/${post.author.id}`} className="byline">
-          <Avatar id={post.author.id} name={post.author.name} size={48} />
-          <span><small>Yazan</small><strong>{post.author.name}</strong></span>
-        </Link>
+    <>
+      <article className="article card">
+        <div className="article-top">
+          <button type="button" className="btn icon-btn" onClick={back} aria-label="Geri"><Icon name="back" /></button>
+          {post.category && <Link className="badge badge-blue" to={`/kesfet?kategori=${post.category.slug}`}>{post.category.name}</Link>}
+          {post.featured && <span className="badge badge-amber"><Icon name="star" className="icon" filled /> Öne çıkan</span>}
+        </div>
+        <h1 className="article-title">{post.title}</h1>
+        {post.excerpt && <p className="article-lede">{post.excerpt}</p>}
+        {post.author && (
+          <div className="post-head">
+            <Link to={`/yazar/${post.author.id}`} tabIndex={-1} aria-hidden="true"><Avatar person={post.author} size={48} ring /></Link>
+            <div className="who">
+              <Link to={`/yazar/${post.author.id}`}>{post.author.name || "İsimsiz yazar"}</Link>
+              <small>{fmtDate(post.published_at)} · {readingMinutes(post.content)} dk okuma</small>
+            </div>
+            <FollowButton authorId={post.author.id} small />
+          </div>
+        )}
+        {post.cover && <img className="article-cover" src={post.cover} alt="" />}
+        <div className="prose" dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
+        {post.tags.length > 0 && (
+          <div className="tag-list" aria-label="Etiketler">
+            {post.tags.map((t) => <Link key={t} className="chip" to={`/kesfet?etiket=${encodeURIComponent(t)}`}>#{t}</Link>)}
+          </div>
+        )}
+        <div className="post-actions article-actions">
+          <VoteButtons kind="post" id={post.id} likes={post.stats.likes} dislikes={post.stats.dislikes} myVote={post.myVote} large />
+          <a href="#yorumlar" className="act act-lg"><Icon name="comment" /><span>{comments} yorum</span></a>
+          <span className="spacer" />
+          <SaveButton postId={post.id} large />
+          <ShareButton slug={post.slug} title={post.title} large />
+        </div>
+      </article>
+
+      <Comments postId={post.id} postAuthorId={post.author_id} onCountChange={onCount} />
+
+      {related.status === "success" && related.data.length > 0 && (
+        <section aria-labelledby="siradaki" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <h2 id="siradaki" style={{ fontSize: 24 }}>Sıradaki yazılar</h2>
+          {related.data.map((p) => <PostCard key={p.id} post={p} showFollow={false} />)}
+        </section>
       )}
-      </div>
-    </article>
+    </>
   );
 }

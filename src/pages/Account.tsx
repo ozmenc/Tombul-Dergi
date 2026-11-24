@@ -1,0 +1,149 @@
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { Link, Navigate, useLocation } from "react-router";
+import { applyForAuthor, updateProfile } from "../lib/api/people";
+import { IMAGE_TYPES, uploadImage } from "../lib/api/storage";
+import { supabase } from "../lib/supabase";
+import { signOut, useAuth } from "../lib/auth";
+import { useTitle } from "../lib/useTitle";
+import { ROLE_LABEL, type Profile } from "../lib/types";
+import { Avatar } from "../components/Avatar";
+import { Bottle } from "../components/Bottle";
+import { Icon } from "../components/Icon";
+import { ErrorState, Spinner } from "../components/States";
+import { useToast } from "../components/Toast";
+
+export default function Account() {
+  useTitle("Hesabım");
+  const auth = useAuth();
+  const { pathname } = useLocation();
+  if (auth.status === "loading") return <Spinner />;
+  if (auth.status === "error") return <ErrorState title="Hesabın yüklenemedi" onRetry={auth.retry} />;
+  if (auth.status === "signed-out") return <Navigate to={`/giris?next=${encodeURIComponent(pathname)}`} replace />;
+  return <AccountForms me={auth.profile} refresh={auth.refresh} />;
+}
+
+function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<void> }) {
+  const toast = useToast();
+  const { hash } = useLocation();
+  const [profile, setProfile] = useState({ name: me.name, bio: me.bio, avatar_url: me.avatar_url });
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [hash]);
+
+  async function onAvatar(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, me.id);
+      setProfile((p) => ({ ...p, avatar_url: url }));
+      toast("success", "Fotoğraf yüklendi. Kaydetmeyi unutma.");
+    }
+    catch (err) { toast("error", (err as Error).message); }
+    finally { setUploading(false); }
+  }
+
+  async function saveProfile(e: FormEvent) {
+    e.preventDefault();
+    if (!profile.name.trim()) return setError("Adını yaz.");
+    setError("");
+    setSaving(true);
+    try { await updateProfile(me.id, { name: profile.name.trim(), bio: profile.bio.trim(), avatar_url: profile.avatar_url }); await refresh(); toast("success", "Profilin kaydedildi."); }
+    catch (err) { setError("Kaydedilemedi: " + (err as Error).message); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <>
+      <header className="profile-head card">
+        <Avatar person={{ id: me.id, name: profile.name || me.name, avatar_url: profile.avatar_url }} size={96} ring />
+        <div className="profile-text">
+          <span className="badge badge-blue">{ROLE_LABEL[me.role]}</span>
+          <h1>{me.name || "Hesabım"}</h1>
+          <p className="muted">Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür.</p>
+        </div>
+        <button type="button" className="btn" onClick={() => signOut()}><Icon name="logout" /> Çıkış yap</button>
+      </header>
+
+      <form className="card form-card" onSubmit={saveProfile} noValidate>
+        <h2>Profil</h2>
+        <div className="field">
+          <span>Fotoğraf</span>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <label className="btn">
+              {uploading ? "Yükleniyor…" : "Fotoğraf seç"}
+              <input type="file" accept={IMAGE_TYPES.join(",")} className="sr-only" disabled={uploading} onChange={onAvatar} />
+            </label>
+            {profile.avatar_url && <button type="button" className="linkish" onClick={() => setProfile((p) => ({ ...p, avatar_url: "" }))}>Fotoğrafı kaldır</button>}
+          </div>
+        </div>
+        <label className="field"><span>Ad</span><input value={profile.name} onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))} maxLength={80} required /></label>
+        <label className="field"><span>Hakkında</span><textarea rows={3} value={profile.bio} onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))} maxLength={600} /></label>
+        {error && <p className="form-error" role="alert">{error}</p>}
+        <button className="btn btn-primary" disabled={saving || uploading}>{saving ? "Kaydediliyor…" : "Profili kaydet"}</button>
+      </form>
+
+      <Authorship me={me} refresh={refresh} />
+      <PasswordForm />
+    </>
+  );
+}
+
+function Authorship({ me, refresh }: { me: Profile; refresh: () => Promise<void> }) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  async function apply() {
+    setBusy(true);
+    try { await applyForAuthor(me.id); await refresh(); toast("success", "Başvurun yönetime iletildi."); }
+    catch { toast("error", "Başvuru gönderilemedi. Tekrar dene."); }
+    finally { setBusy(false); }
+  }
+  return (
+    <section id="yazarlik" className="card form-card authorship">
+      <Bottle mood={me.role === "pending" ? "filling" : me.role === "reader" ? "idle" : "happy"} size={64} />
+      <div style={{ flex: 1 }}>
+        <h2>Yazarlık</h2>
+        {me.role === "reader" && <p className="muted">Yazar olursan kendi yazılarını yazıp yayınlayabilirsin. Başvurunu yönetim onaylar.</p>}
+        {me.role === "pending" && <p className="muted">Başvurun inceleniyor. Onaylanınca panelin açılacak; o zamana kadar okumaya ve yorum yapmaya devam edebilirsin.</p>}
+        {(me.role === "author" || me.role === "admin") && <p className="muted">Yazarsın. Yeni yazılarını panelden yazabilirsin.</p>}
+      </div>
+      {me.role === "reader" && <button className="btn btn-amber" onClick={apply} disabled={busy}>{busy ? "Gönderiliyor…" : "Yazarlık için başvur"}</button>}
+      {(me.role === "author" || me.role === "admin") && <Link className="btn btn-primary" to="/panel/yeni"><Icon name="pen" /> Yeni yazı</Link>}
+    </section>
+  );
+}
+
+function PasswordForm() {
+  const toast = useToast();
+  const [pw, setPw] = useState({ a: "", b: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (pw.a.length < 8) return setError("Şifre en az 8 karakter olmalı.");
+    if (pw.a !== pw.b) return setError("İki şifre aynı değil.");
+    setError("");
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw.a });
+    setBusy(false);
+    if (error) return setError("Şifre değiştirilemedi: " + error.message);
+    setPw({ a: "", b: "" });
+    toast("success", "Şifren değiştirildi.");
+  }
+  return (
+    <form className="card form-card" onSubmit={submit} noValidate>
+      <h2>Şifre değiştir</h2>
+      <div className="grid-2">
+        <label className="field"><span>Yeni şifre</span><input type="password" value={pw.a} onChange={(e) => setPw({ ...pw, a: e.target.value })} autoComplete="new-password" minLength={8} /></label>
+        <label className="field"><span>Yeni şifre (tekrar)</span><input type="password" value={pw.b} onChange={(e) => setPw({ ...pw, b: e.target.value })} autoComplete="new-password" minLength={8} /></label>
+      </div>
+      {error && <p className="form-error" role="alert">{error}</p>}
+      <button className="btn btn-primary" disabled={busy}>{busy ? "Değiştiriliyor…" : "Şifreyi değiştir"}</button>
+    </form>
+  );
+}

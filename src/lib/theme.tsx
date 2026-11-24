@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Theme } from "../toon/palette";
-import { redrawAll } from "../toon/ticker";
+export type Theme = "light" | "dark";
 
 const KEY = "tombul-tema";
 const read = (): Theme | null => { try { const v = localStorage.getItem(KEY); return v === "light" || v === "dark" ? v : null; } catch { return null; } };
@@ -23,8 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#1d2636" : "#f4ead5");
-    redrawAll();
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0d1030" : "#f3f5fb");
   }, [theme]);
 
   const toggle = useCallback(() => {

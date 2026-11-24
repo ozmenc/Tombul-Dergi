@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "logo": "node scripts/export-logo.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.2",

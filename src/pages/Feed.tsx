@@ -1,0 +1,92 @@
+import { useMemo } from "react";
+import { Link, useSearchParams } from "react-router";
+import { listPublished } from "../lib/api/posts";
+import { listAuthors } from "../lib/api/people";
+import { listCategories } from "../lib/api/categories";
+import { useAsync } from "../lib/useAsync";
+import { useTitle } from "../lib/useTitle";
+import { useMe } from "../lib/auth";
+import { useSocial } from "../lib/social";
+import { popularity } from "../lib/format";
+import { canWrite } from "../lib/types";
+import { Avatar } from "../components/Avatar";
+import { Icon } from "../components/Icon";
+import { PostCard } from "../components/PostCard";
+import { EmptyState, ErrorState, FeedSkeleton } from "../components/States";
+
+type Tab = "senin" | "takip" | "populer";
+const TABS: [Tab, string][] = [["senin", "Senin için"], ["takip", "Takip ettiklerin"], ["populer", "Popüler"]];
+
+export default function Feed() {
+  useTitle();
+  const me = useMe();
+  const { following, ready } = useSocial();
+  const [params, setParams] = useSearchParams();
+  const tab = (TABS.find(([k]) => k === params.get("akis"))?.[0] ?? "senin") as Tab;
+  const cat = params.get("kategori");
+
+  const [cats] = useAsync(listCategories, []);
+  const [authors] = useAsync(listAuthors, []);
+  const categoryId = cats.status === "success" ? cats.data.find((c) => c.slug === cat)?.id : undefined;
+  const followIds = [...following].sort().join(",");
+  const waiting = tab === "takip" && !ready;
+  const [posts, retry] = useAsync(
+    () => (waiting ? new Promise<never>(() => {}) : tab === "takip" ? listPublished({ authorIds: [...following], categoryId }) : listPublished({ categoryId })),
+    [tab, categoryId, tab === "takip" ? followIds : "", me?.id, waiting]
+  );
+
+  const shown = useMemo(() => {
+    if (posts.status !== "success") return [];
+    const list = [...posts.data];
+    if (tab === "populer") return list.sort((a, b) => popularity(b.stats) - popularity(a.stats));
+    if (tab === "senin") return list.sort((a, b) => Number(b.featured) - Number(a.featured));
+    return list;
+  }, [posts, tab]);
+
+  const set = (key: string, value: string | null) => {
+    const next = new URLSearchParams(params);
+    if (value) next.set(key, value); else next.delete(key);
+    setParams(next, { replace: true });
+  };
+
+  return (
+    <>
+      <div className="stories" aria-label="Yazarlar">
+        <Link to={!me ? "/kayit" : canWrite(me.role) ? "/panel/yeni" : "/hesap#yazarlik"} className="story story-add">
+          <span className="ring"><span className="avatar" style={{ width: 66, height: 66, background: "var(--surface)", color: "var(--muted)" }}><Icon name="plus" /></span></span>
+          <span>{me && canWrite(me.role) ? "Yeni yazı" : "Sen de yaz"}</span>
+        </Link>
+        {authors.status === "success" && authors.data.map((a) => (
+          <Link key={a.id} to={`/yazar/${a.id}`} className="story">
+            <Avatar person={a} size={66} ring />
+            <span>{a.name || "İsimsiz"}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="segmented" role="group" aria-label="Akış">
+          {TABS.map(([k, label]) => <button key={k} type="button" aria-pressed={tab === k} onClick={() => set("akis", k === "senin" ? null : k)}>{label}</button>)}
+        </div>
+      </div>
+      {cats.status === "success" && (
+        <div className="stories" role="group" aria-label="Kategoriler" style={{ gap: 8 }}>
+          <button type="button" className={`chip ${!cat ? "on" : ""}`} onClick={() => set("kategori", null)}>Hepsi</button>
+          {cats.data.map((c) => <button key={c.id} type="button" className={`chip ${cat === c.slug ? "on" : ""}`} onClick={() => set("kategori", c.slug)}>{c.name}</button>)}
+        </div>
+      )}
+
+      {tab === "takip" && !me ? (
+        <EmptyState title="Takip ettiklerini görmek için giriş yap" action={<Link className="btn btn-primary" to="/giris?next=%2F%3Fakis%3Dtakip">Giriş yap</Link>}>
+          Sevdiğin yazarları takip et, yazıları burada toplansın.
+        </EmptyState>
+      ) : posts.status === "loading" ? <FeedSkeleton />
+        : posts.status === "error" ? <ErrorState title="Akış yüklenemedi" error={posts.error} onRetry={retry} />
+        : shown.length === 0 ? (
+          tab === "takip"
+            ? <EmptyState title="Henüz kimseyi takip etmiyorsun" action={<Link className="btn btn-primary" to="/yazarlar">Yazarları keşfet</Link>}>Takip ettiğin yazarların yeni yazıları burada görünür.</EmptyState>
+            : <EmptyState title={cat ? "Bu kategoride henüz yazı yok" : "Henüz yayında yazı yok"} action={cat ? <button className="btn" onClick={() => set("kategori", null)}>Tüm yazılar</button> : undefined}>Yazarlar karalamaya devam ediyor. Birazdan yine uğra.</EmptyState>
+        ) : shown.map((p) => <PostCard key={p.id} post={p} />)}
+    </>
+  );
+}

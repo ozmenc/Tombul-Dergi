@@ -1,49 +1,44 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
-import { Mascot } from "./Mascot";
+import { Bottle } from "./Bottle";
 
-export function PostListSkeleton({ rows = 3 }: { rows?: number }) {
+export function FeedSkeleton({ rows = 3 }: { rows?: number }) {
   return (
-    <div className="skeleton-list" aria-busy="true" aria-label="Yükleniyor">
+    <div style={{ display: "grid", gap: 20 }} aria-busy="true" aria-label="Yükleniyor">
       {Array.from({ length: rows }, (_, i) => (
-        <div className="sk-row" key={i}>
+        <div className="sk-card" key={i}>
+          <div className="sk-row"><div className="sk sk-circle" /><div className="sk sk-line sk-short" /></div>
           <div className="sk sk-title" />
           <div className="sk sk-line" />
-          <div className="sk sk-line short" />
+          <div className="sk sk-line sk-short" />
         </div>
       ))}
     </div>
   );
 }
 
-export function ArticleSkeleton() {
+export function ListSkeleton({ rows = 4 }: { rows?: number }) {
   return (
-    <div className="article-wrap" aria-busy="true" aria-label="Yükleniyor">
-      <div className="card article-card">
-        <div className="sk sk-meta" />
-        <div className="sk sk-h1" />
-        <div className="sk sk-h1 short" />
-        {Array.from({ length: 6 }, (_, i) => <div className="sk sk-line" key={i} />)}
-      </div>
+    <div className="sk-card" aria-busy="true" aria-label="Yükleniyor">
+      {Array.from({ length: rows }, (_, i) => <div className="sk-row" key={i}><div className="sk sk-circle" /><div className="sk sk-line" /></div>)}
     </div>
   );
 }
 
-/** Atomcuk'un elektronları hızlanır: bir şey yükleniyor. */
+/** Şişe dolarken: bir şey yükleniyor. */
 export function Spinner({ label = "Yükleniyor" }: { label?: string }) {
   return (
     <div className="state" aria-busy="true">
-      <Mascot kind="atom" mood="busy" size={120} />
+      <Bottle mood="filling" size={64} track={false} />
       <p>{label}…</p>
     </div>
   );
 }
 
-/** Mercek arıyor ama bulamıyor: boş durum. */
-export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
+export function EmptyState({ title, children, action, card = true }: { title: string; children?: ReactNode; action?: ReactNode; card?: boolean }) {
   return (
-    <div className="state">
-      <Mascot kind="scope" mood="search" size={130} />
+    <div className={`state ${card ? "state-card" : ""}`}>
+      <Bottle mood="sad" size={70} />
       <h2>{title}</h2>
       {children && <p>{children}</p>}
       {action}
@@ -51,31 +46,40 @@ export function EmptyState({ title, children, action }: { title: string; childre
   );
 }
 
-/** Fokur'un deneyi patladı: hata durumu. */
 export function ErrorState({ title = "Yüklenemedi", error, onRetry }: { title?: string; error?: Error; onRetry?: () => void }) {
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
   return (
-    <div className="state state-error" role="alert">
-      <Mascot kind="flask" mood="error" size={130} />
+    <div className="state state-card" role="alert">
+      <Bottle mood="sad" size={70} />
       <h2>{title}</h2>
       <p>{offline ? "İnternet bağlantın yok gibi görünüyor. Bağlanınca tekrar dene." : "Sunucudan yanıt alınamadı. Birazdan tekrar dene."}</p>
       {error && <p className="state-detail">{error.message}</p>}
-      {onRetry && <button className="btn" onClick={onRetry}>Tekrar dene</button>}
+      {onRetry && <button className="btn btn-primary" onClick={onRetry}>Tekrar dene</button>}
     </div>
   );
 }
 
-/** Füze yörüngeden çıkmış: 404. */
-export function NotFound({ title = "Bu sayfa yörüngeden çıkmış", children }: { title?: string; children?: ReactNode }) {
+/** 404: şişe devrilmiş. */
+export function NotFound({ title = "Bu sayfa devrilmiş", children }: { title?: string; children?: ReactNode }) {
   return (
-    <section className="lost">
-      <Mascot kind="rocket" mood="lost" size={240} className="lost-art" />
-      <div className="card lost-text">
-        <p className="kicker">404</p>
-        <h1>{title}</h1>
-        <p>{children ?? "Aradığın sayfa taşınmış, silinmiş ya da hiç var olmamış olabilir."}</p>
-        <Link className="btn btn-primary" to="/">Ana sayfaya dön</Link>
-      </div>
+    <section className="state state-card lost">
+      <Bottle mood="lost" size={200} />
+      <p className="badge badge-amber">404</p>
+      <h1>{title}</h1>
+      <p>{children ?? "Aradığın sayfa taşınmış, silinmiş ya da hiç var olmamış olabilir."}</p>
+      <Link className="btn btn-primary" to="/">Akışa dön</Link>
+    </section>
+  );
+}
+
+/** Yetkisi olmayan ama giriş yapmış kullanıcı. */
+export function Forbidden({ children }: { children?: ReactNode }) {
+  return (
+    <section className="state state-card">
+      <Bottle mood="shy" size={80} track={false} />
+      <h1>Bu sayfa sana kapalı</h1>
+      <p>{children ?? "Burayı görmek için gereken yetkin yok."}</p>
+      <Link className="btn" to="/">Akışa dön</Link>
     </section>
   );
 }
