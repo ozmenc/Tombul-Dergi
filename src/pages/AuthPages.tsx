@@ -112,7 +112,7 @@ export function Signup() {
     setBusy(true);
     try {
       await signUp(form);
-      toast("success", form.wantsAuthor ? "Hoş geldin! Yazarlık başvurun yönetime iletildi." : "Hoş geldin! Şerefe.");
+      toast("success", form.wantsAuthor ? "Hoş geldin! Hesabın ve yazarlık başvurun yönetim onayını bekliyor." : "Hoş geldin! Yorum yazabilmen için hesabın yönetim onayını bekliyor.");
       navigate(next, { replace: true });
     } catch (err) {
       setError((err as Error).message);
@@ -122,7 +122,7 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout shy={shy} title="Aramıza katıl" lede="Yorum yap, beğen, kaydet. İstersen yazar olmak için de başvur.">
+    <AuthLayout shy={shy} title="Aramıza katıl" lede="Oku, beğen, kaydet. Yönetim hesabını onaylayınca yorum yazabilirsin; istersen yazarlığa da başvur.">
       <form onSubmit={submit} noValidate>
         <label className="field"><span>Adın</span><input value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={80} required /></label>
         <label className="field"><span>E-posta</span><input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" required /></label>

@@ -6,7 +6,7 @@ import { ReportButton } from "./Report";
 import { useAsync } from "../lib/useAsync";
 import { useMe } from "../lib/auth";
 import { fmtRelative } from "../lib/format";
-import type { Comment, Profile } from "../lib/types";
+import { canComment, type Comment, type Profile } from "../lib/types";
 import { Avatar } from "./Avatar";
 import { VoteButtons } from "./Actions";
 import { Icon } from "./Icon";
@@ -51,7 +51,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
         </div>
       </div>
 
-      {me ? <Composer me={me} postId={postId} parentId={null} onAdded={added} /> : <LoginNudge />}
+      {!me ? <LoginNudge /> : canComment(me) ? <Composer me={me} postId={postId} parentId={null} onAdded={added} /> : <AwaitingApproval />}
 
       {state.status === "loading" && <ListSkeleton rows={3} />}
       {state.status === "error" && <ErrorState title="Yorumlar yüklenemedi" error={state.error} onRetry={retry} />}
@@ -59,7 +59,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
         <p className="muted" style={{ textAlign: "center", padding: "12px 0" }}>Henüz yorum yok. İlk yorumu sen yaz.</p>
       )}
       {threads.map(({ c, replies }) => (
-        <CommentItem key={c.id} c={c} postAuthorId={postAuthorId} fresh={fresh === c.id} onReply={() => setReplyTo(replyTo === c.id ? null : c.id)} onRemoved={removed} onHidden={toggledHidden}>
+        <CommentItem key={c.id} c={c} postAuthorId={postAuthorId} fresh={fresh === c.id} onReply={canComment(me) ? () => setReplyTo(replyTo === c.id ? null : c.id) : undefined} onRemoved={removed} onHidden={toggledHidden}>
           {(replies.length > 0 || replyTo === c.id) && (
             <div className="replies">
               {replies.map((r) => <CommentItem key={r.id} c={r} postAuthorId={postAuthorId} fresh={fresh === r.id} onRemoved={removed} onHidden={toggledHidden} />)}
@@ -69,6 +69,14 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
         </CommentItem>
       ))}
     </section>
+  );
+}
+
+function AwaitingApproval() {
+  return (
+    <div className="login-nudge" role="status">
+      <p>Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin; o zamana kadar okuyabilir, beğenebilir ve kaydedebilirsin.</p>
+    </div>
   );
 }
 

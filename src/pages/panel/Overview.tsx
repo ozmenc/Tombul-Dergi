@@ -49,7 +49,8 @@ export default function Overview() {
         {isAdmin && counts.status === "success" && counts.data && (
           <>
             <Stat icon="users" label="Üye" value={counts.data.members} to="/panel/uyeler" />
-            <Stat icon="shield" label="Başvuru" value={counts.data.pending} to="/panel/uyeler?sekme=basvuru" />
+            <Stat icon="check" label="Onay bekleyen" value={counts.data.unapproved} to="/panel/uyeler?sekme=onay" />
+            <Stat icon="shield" label="Yazarlık başvurusu" value={counts.data.pending} to="/panel/uyeler?sekme=basvuru" />
             <Stat icon="eyeOff" label="Gizli yorum" value={counts.data.hidden} to="/panel/yorumlar?gizli=1" />
             <Stat icon="dislike" label="Beğenmeme" value={sum("dislikes")} />
           </>

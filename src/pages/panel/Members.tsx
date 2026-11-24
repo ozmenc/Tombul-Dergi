@@ -1,11 +1,11 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { AdminOnly, PanelHead, usePanel } from "./PanelLayout";
-import { createAuthor, listMemberEmails, listMembers, resetPassword, setRole } from "../../lib/api/people";
+import { createAuthor, listMemberEmails, listMembers, resetPassword, setApproved, setRole } from "../../lib/api/people";
 import { useAsync } from "../../lib/useAsync";
 import { useTitle } from "../../lib/useTitle";
 import { EMAIL_RE, fmtRelative } from "../../lib/format";
-import { ROLE_LABEL, type Profile, type Role } from "../../lib/types";
+import { canWrite, ROLE_LABEL, type Profile, type Role } from "../../lib/types";
 import { Avatar } from "../../components/Avatar";
 import { Icon } from "../../components/Icon";
 import { EmptyState, ErrorState, ListSkeleton } from "../../components/States";
@@ -16,13 +16,20 @@ export default function Members() {
   return <AdminOnly><MemberManager /></AdminOnly>;
 }
 
-const TABS = [["basvuru", "Başvurular"], ["hepsi", "Tüm üyeler"]] as const;
+const TABS = [["onay", "Onay bekleyenler"], ["basvuru", "Yazarlık başvuruları"], ["hepsi", "Tüm üyeler"]] as const;
+type Tab = (typeof TABS)[number][0];
+
+const EMPTY: Record<Tab, [string, string]> = {
+  onay: ["Onay bekleyen hesap yok", "Yeni kayıtlar burada görünür; onaylayınca yorum yazabilirler."],
+  basvuru: ["Bekleyen başvuru yok", "Yeni yazarlık başvuruları burada görünür."],
+  hepsi: ["Eşleşen üye yok", "Başka bir isim dene."],
+};
 
 function MemberManager() {
   const { me } = usePanel();
   const toast = useToast();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("sekme") === "basvuru" ? "basvuru" : "hepsi";
+  const tab: Tab = TABS.find(([k]) => k === params.get("sekme"))?.[0] ?? "hepsi";
   const [q, setQ] = useState("");
   const [state, retry, setState] = useAsync(async () => {
     const [members, emails] = await Promise.all([listMembers(), listMemberEmails()]);
@@ -31,21 +38,31 @@ function MemberManager() {
   const [busyId, setBusyId] = useState("");
 
   const list = state.status === "success" ? state.data : [];
-  const pending = list.filter((m) => m.role === "pending");
+  const byTab = useMemo(() => ({
+    onay: list.filter((m) => !m.approved),
+    basvuru: list.filter((m) => m.role === "pending"),
+    hepsi: list,
+  }), [list]);
   const shown = useMemo(() => {
     const term = q.trim().toLocaleLowerCase("tr-TR");
-    return (tab === "basvuru" ? pending : list).filter((m) => !term || m.name.toLocaleLowerCase("tr-TR").includes(term) || m.email.toLowerCase().includes(term));
-  }, [list, pending, tab, q]);
+    return byTab[tab].filter((m) => !term || m.name.toLocaleLowerCase("tr-TR").includes(term) || m.email.toLowerCase().includes(term));
+  }, [byTab, tab, q]);
 
-  async function change(m: Profile, role: Role, done: string) {
+  /** İyimser güncelleme; hata olursa eski listeye döner. */
+  async function update(m: Profile, patch: Partial<Profile>, save: () => Promise<void>, done: string) {
     if (state.status !== "success") return;
     const before = state.data;
     setBusyId(m.id);
-    setState({ status: "success", data: before.map((x) => (x.id === m.id ? { ...x, role } : x)) });
-    try { await setRole(m.id, role); toast("success", done); }
-    catch (err) { setState({ status: "success", data: before }); toast("error", "Rol değiştirilemedi: " + (err as Error).message); }
+    setState({ status: "success", data: before.map((x) => (x.id === m.id ? { ...x, ...patch } : x)) });
+    try { await save(); toast("success", done); }
+    catch (err) { setState({ status: "success", data: before }); toast("error", "Güncellenemedi: " + (err as Error).message); }
     finally { setBusyId(""); }
   }
+  // Yazar ve admin her zaman onaylıdır (veritabanı da böyle yapar).
+  const change = (m: Profile, role: Role, done: string) =>
+    update(m, canWrite(role) ? { role, approved: true } : { role }, () => setRole(m.id, role), done);
+  const approve = (m: Profile, approved: boolean) =>
+    update(m, { approved }, () => setApproved(m.id, approved), approved ? `${m.name || "Üye"} artık yorum yazabilir.` : "Onay kaldırıldı; yorum yazamaz.");
 
   return (
     <>
@@ -55,7 +72,7 @@ function MemberManager() {
           <div className="segmented" role="group" aria-label="Üye listesi">
             {TABS.map(([k, label]) => (
               <button key={k} type="button" aria-pressed={tab === k} onClick={() => setParams(k === "hepsi" ? {} : { sekme: k }, { replace: true })}>
-                {label} <span>{k === "basvuru" ? pending.length : list.length}</span>
+                {label} <span>{byTab[k].length}</span>
               </button>
             ))}
           </div>
@@ -64,17 +81,17 @@ function MemberManager() {
         {state.status === "loading" && <ListSkeleton rows={4} />}
         {state.status === "error" && <ErrorState title="Üyeler yüklenemedi" error={state.error} onRetry={retry} />}
         {state.status === "success" && (shown.length === 0
-          ? <EmptyState card={false} title={tab === "basvuru" ? "Bekleyen başvuru yok" : "Eşleşen üye yok"}>{tab === "basvuru" ? "Yeni yazarlık başvuruları burada görünür." : "Başka bir isim dene."}</EmptyState>
+          ? <EmptyState card={false} title={EMPTY[tab][0]}>{EMPTY[tab][1]}</EmptyState>
           : (
             <ul className="rows">
               {shown.map((m) => (
                 <li key={m.id} className="row">
                   <Avatar person={m} size={40} />
-                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
+                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"} {!m.approved && <span className="badge badge-amber">onay bekliyor</span>}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
                   {m.role === "pending" ? (
                     <>
-                      <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => change(m, "author", `${m.name} artık yazar.`)}><Icon name="check" /> Onayla</button>
-                      <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => change(m, "reader", "Başvuru reddedildi; okur olarak devam ediyor.")}>Reddet</button>
+                      <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => change(m, "author", `${m.name} artık yazar.`)}><Icon name="pen" /> Yazar yap</button>
+                      <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => change(m, "reader", "Yazarlık başvurusu reddedildi; okur olarak devam ediyor.")}>Başvuruyu reddet</button>
                     </>
                   ) : (
                     <>
@@ -86,6 +103,9 @@ function MemberManager() {
                       </select>
                     </>
                   )}
+                  {!canWrite(m.role) && (m.approved
+                    ? <button type="button" className="btn btn-sm btn-ghost" disabled={busyId === m.id} onClick={() => approve(m, false)}>Onayı kaldır</button>
+                    : <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => approve(m, true)}><Icon name="check" /> Hesabı onayla</button>)}
                   {m.id !== me.id && <PasswordReset member={m} />}
                 </li>
               ))}

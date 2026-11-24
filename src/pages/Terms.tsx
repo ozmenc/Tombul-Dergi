@@ -26,6 +26,11 @@ export default function Terms() {
           Yazılar ve yorumlar yazarlarının görüşüdür. Tombul Dergi'nin görüşünü yansıtmaz.
         </p>
 
+        <p>
+          Yorum ve yazı yalnızca <strong>yönetimin onayladığı hesaplardan</strong> paylaşılabilir. Onay, içeriğin
+          yönetimce incelendiği ya da benimsendiği anlamına gelmez; sorumluluk yine paylaşan üyededir.
+        </p>
+
         <h2>3. Üye olarak neyi kabul ediyorsun?</h2>
         <p>Kayıt olarak, yazı yayınlayarak ya da yorum göndererek şunları kabul edersin:</p>
         <ul>

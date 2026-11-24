@@ -2,7 +2,7 @@ import { must, postJson, supabase } from "./client";
 import type { Profile, Role } from "../types";
 import { UUID_RE } from "../format";
 
-const PROFILE_FIELDS = "id,name,bio,avatar_url,role,created_at,name_changed_at";
+const PROFILE_FIELDS = "id,name,bio,avatar_url,role,created_at,name_changed_at,approved";
 
 export const getProfile = async (id: string) =>
   must<Profile | null>(await supabase.from("profiles").select(PROFILE_FIELDS).eq("id", id).maybeSingle());
@@ -60,6 +60,11 @@ export async function listMemberEmails() {
   return new Map(rows.map((r) => [r.id, r.email]));
 }
 
+/** Admin: hesabın yorum yazma onayını verir ya da geri alır. */
+export async function setApproved(id: string, approved: boolean) {
+  must(await supabase.from("profiles").update({ approved }).eq("id", id));
+}
+
 export async function setRole(id: string, role: Role) {
   must(await supabase.from("profiles").update({ role }).eq("id", id));
 }
@@ -80,11 +85,12 @@ export async function signUp(body: { name: string; email: string; password: stri
 /** Admin paneli özeti: üye, başvuru ve yorum sayıları. */
 export async function adminCounts() {
   const count = (r: { data: unknown; count: number | null; error: { message: string } | null }) => (must(r), r.count ?? 0);
-  const [members, pending, comments, hidden] = await Promise.all([
+  const [members, unapproved, pending, comments, hidden] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("approved", false),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "pending"),
     supabase.from("comments").select("id", { count: "exact", head: true }),
     supabase.from("comments").select("id", { count: "exact", head: true }).eq("hidden", true),
   ]);
-  return { members: count(members), pending: count(pending), comments: count(comments), hidden: count(hidden) };
+  return { members: count(members), unapproved: count(unapproved), pending: count(pending), comments: count(comments), hidden: count(hidden) };
 }

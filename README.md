@@ -23,10 +23,12 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 
 | Rol | Yapabilir |
 |---|---|
-| `reader` (okur) | yorum, beğen/beğenme, kaydet, takip; yazarlığa başvurur |
+| `reader` (okur) | beğen/beğenme, kaydet, takip; admin hesabı onaylayınca yorum; yazarlığa başvurur |
 | `pending` (başvuran) | okur gibi; admin onayını bekler |
 | `author` (yazar) | kendi yazılarını yazar, yayınlar, siler |
 | `admin` | her şey |
+
+Yeni hesaplar onaysız açılır (`profiles.approved`); yorum için admin onayı gerekir (Panel → Üyeler → Onay bekleyenler). Yazar ve admin her zaman onaylıdır.
 
 Yetkiler tarayıcıda değil, Supabase RLS kurallarında (`supabase/*.sql`).
 
@@ -52,7 +54,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
 **Site URL** canlı adres olmalı, **Redirect URLs** listesinde `https://<canlı adres>/sifre-yenile` bulunmalı.

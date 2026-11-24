@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabase";
 import { signOut, useAuth } from "../lib/auth";
 import { fmtDate } from "../lib/format";
 import { useTitle } from "../lib/useTitle";
-import { ROLE_LABEL, type Profile } from "../lib/types";
+import { canComment, ROLE_LABEL, type Profile } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { Bottle } from "../components/Bottle";
 import { Icon } from "../components/Icon";
@@ -68,9 +68,10 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
       <header className="profile-head card">
         <Avatar person={{ id: me.id, name: profile.name || me.name, avatar_url: profile.avatar_url }} size={96} ring />
         <div className="profile-text">
-          <span className="badge badge-blue">{ROLE_LABEL[me.role]}</span>
+          <span className="badge badge-blue">{ROLE_LABEL[me.role]}</span>{" "}
+          {!canComment(me) && <span className="badge badge-amber">Onay bekliyor</span>}
           <h1>{me.name || "Hesabım"}</h1>
-          <p className="muted">Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür.</p>
+          <p className="muted">{canComment(me) ? "Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür." : "Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin."}</p>
         </div>
         <button type="button" className="btn" onClick={() => signOut()}><Icon name="logout" /> Çıkış yap</button>
       </header>

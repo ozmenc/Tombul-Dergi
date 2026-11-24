@@ -1,6 +1,6 @@
 export type Role = "reader" | "pending" | "author" | "admin";
 
-export type Profile = { id: string; name: string; bio: string; avatar_url: string; role: Role; created_at: string; name_changed_at: string | null };
+export type Profile = { id: string; name: string; bio: string; avatar_url: string; role: Role; created_at: string; name_changed_at: string | null; approved: boolean };
 
 /** Yazı ve yorumlarda gösterilen kısa profil. */
 export type PersonRef = { id: string; name: string; avatar_url: string };
@@ -49,5 +49,8 @@ export type Comment = {
 };
 
 export const canWrite = (role: Role | undefined) => role === "author" || role === "admin";
+
+/** Yorum yalnızca admin onaylı hesaplardan (supabase/008_approval.sql). */
+export const canComment = (p: Profile | null) => !!p && (p.approved || canWrite(p.role));
 
 export const ROLE_LABEL: Record<Role, string> = { reader: "Okur", pending: "Yazarlık başvurusu", author: "Yazar", admin: "Admin" };
