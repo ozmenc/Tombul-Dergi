@@ -1,6 +1,8 @@
 # Tombul Dergi
 
-Çok yazarlı küçük bir dergi. Vite + React + TypeScript, three.js karakterler, Supabase (veritabanı, giriş, resimler), Vercel.
+Üniversitelilerin her şey hakkında yazdığı dergi. Vite + React + TypeScript, Supabase (veritabanı, giriş, resimler), Vercel.
+
+Görünüm 1950'ler atom çağı karikatürü: aydınlık ve koyu tema, canvas'ta çizilen 2D maskotlar (Tombul, Atomcuk, Fokur, Halka, Mercek, Füze). Çizim motoru (`src/toon/toon.ts`) [Lemo-Opuscar](https://github.com/lemomo-ai/lemo-opuscar)'ın Mid-century Cartoon demo motorundan uyarlandı (Lemo-Opuscar by Lemomo (LemoLab), MIT).
 
 ## Nasıl çalışır
 

@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./styles.css";
 import { AuthProvider } from "./lib/auth";
+import { ThemeProvider } from "./lib/theme";
+import { Backdrop } from "./components/Backdrop";
 import { ToastProvider } from "./components/Toast";
 import { Layout, RouteError } from "./components/Layout";
 import { NotFound, Spinner } from "./components/States";
@@ -44,10 +46,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <Backdrop />
+      <AuthProvider>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>
 );

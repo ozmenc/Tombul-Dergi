@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
 import { useTitle } from "../lib/useTitle";
 import { Spinner } from "../components/States";
+import { Mascot } from "../components/Mascot";
 
 export default function Login() {
   useTitle("Yazar girişi");
@@ -27,9 +28,10 @@ export default function Login() {
   }
 
   return (
-    <section className="auth-card">
+    <section className="card auth-card">
+      <Mascot kind="tombul" size={130} talk className="auth-mascot" />
       <h1>Yazar girişi</h1>
-      <p>Hesabını admin açar. E-postan ve şifrenle gir.</p>
+      <p>Yazar hesabını dergi yönetimi açar. E-postan ve şifrenle gir.</p>
       <form onSubmit={submit} noValidate={false}>
         <label className="field"><span>E-posta</span><input name="email" type="email" autoComplete="username" required /></label>
         <label className="field"><span>Şifre</span><input name="password" type="password" autoComplete="current-password" required /></label>

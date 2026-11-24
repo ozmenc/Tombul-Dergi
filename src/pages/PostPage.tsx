@@ -20,6 +20,7 @@ export default function PostPage() {
   return (
     <article className="article-wrap">
       <Link to="/" className="back">← Tüm yazılar</Link>
+      <div className="card article-card">
       <h1 className="article-title">{post.title}</h1>
       <PostMeta post={post} />
       {post.cover && <img className="article-cover" src={post.cover} alt="" />}
@@ -30,6 +31,7 @@ export default function PostPage() {
           <span><small>Yazan</small><strong>{post.author.name}</strong></span>
         </Link>
       )}
+      </div>
     </article>
   );
 }

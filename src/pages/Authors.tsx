@@ -11,7 +11,7 @@ export default function Authors() {
   return (
     <section className="page">
       <h1 className="page-title">Yazarlar</h1>
-      <p className="page-lede">Tombul Dergi'de yazanlar. Birine tıkla, bütün yazılarını gör.</p>
+      <p className="page-lede">Tombul Dergi'de yazan öğrenciler. Birine tıkla, bütün yazılarını gör.</p>
       {state.status === "loading" && <PostListSkeleton rows={3} />}
       {state.status === "error" && <ErrorState title="Yazarlar yüklenemedi" error={state.error} onRetry={retry} />}
       {state.status === "success" && (state.data.length === 0
@@ -19,7 +19,7 @@ export default function Authors() {
         : <ul className="people">
             {state.data.map((a) => (
               <li key={a.id}>
-                <Link to={`/yazar/${a.id}`} className="person">
+                <Link to={`/yazar/${a.id}`} className="card person">
                   <Avatar id={a.id} name={a.name} size={56} />
                   <span className="person-text">
                     <strong>{a.name || "İsimsiz yazar"}</strong>

@@ -2,6 +2,7 @@ import { Navigate, NavLink, Outlet, useLocation, useOutletContext } from "react-
 import { signOut, useAuth } from "../../lib/auth";
 import type { Profile } from "../../lib/types";
 import { ErrorState, Spinner } from "../../components/States";
+import { Mascot } from "../../components/Mascot";
 
 type PanelCtx = { me: Profile; refresh: () => Promise<void> };
 export const usePanel = () => useOutletContext<PanelCtx>();
@@ -18,7 +19,7 @@ export default function PanelLayout() {
   if (me.role === "pending") {
     return (
       <section className="state page">
-        <div className="state-blob" aria-hidden="true" />
+        <Mascot kind="planet" size={140} />
         <h1>Hesabın onay bekliyor</h1>
         <p>Bir admin seni yazar yaptığında buradan yazmaya başlayabilirsin.</p>
         <button className="btn" onClick={() => signOut()}>Çıkış yap</button>

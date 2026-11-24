@@ -35,8 +35,8 @@ export const slugify = (s: string) =>
 export const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Her yazara kimliğinden türetilen sabit bir tombul renk. */
-export const PALETTE = ["#b8a1ff", "#ff9b71", "#ffd166", "#7fd8be"];
+/** Her yazara kimliğinden türetilen sabit bir atom çağı rengi. */
+export const PALETTE = ["#e4613f", "#e8b43a", "#3fa7a0", "#7f9cc0"];
 export const colorFor = (id: string) => PALETTE[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTE.length];
 
 export const initials = (name: string) =>

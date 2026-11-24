@@ -4,12 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tombul Dergi</title>
-    <meta name="description" content="Tombul Dergi: bir avuç yazarın denemeleri, kısa hikâyeleri ve karalamaları." />
-    <meta name="theme-color" content="#eef0fa" />
+    <meta name="description" content="Tombul Dergi: üniversitelilerin her şey hakkında yazdığı dergi. Ders, kampüs, bilim, şehir, dert, keyif." />
+    <meta name="theme-color" content="#f4ead5" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Tema, sayfa çizilmeden önce: kayıtlı seçim, yoksa sistem.
+      try { var t = localStorage.getItem("tombul-tema"); document.documentElement.dataset.theme = t === "dark" || t === "light" ? t : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } catch (e) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Jost:wght@400;500;600&family=Oleo+Script:wght@700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>
