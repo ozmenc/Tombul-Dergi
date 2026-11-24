@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tombul Dergi</title>
+<meta name="description" content="Tombul Dergi — karalamalar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,100&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#fbf1e3; --ink-soft:#e6d6c2; --night:#1b1426; --amber:#ffb454; --rose:#ff7a90;
+  --glass:rgba(27,20,38,.55); --line:rgba(251,241,227,.22);
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--night);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ---- Flu sokak arka planı ---- */
+.bg{position:fixed;inset:-6%;z-index:-2;filter:blur(9px) saturate(1.15);
+  background:
+    url("images/arka-plan.jpg") center/cover no-repeat,
+    radial-gradient(circle at 14% 62%, rgba(255,180,84,.95) 0 3.2%, transparent 3.8%),
+    radial-gradient(circle at 27% 54%, rgba(255,122,144,.85) 0 2.4%, transparent 3%),
+    radial-gradient(circle at 38% 66%, rgba(255,220,150,.9) 0 3.6%, transparent 4.2%),
+    radial-gradient(circle at 52% 58%, rgba(120,200,255,.7) 0 2.6%, transparent 3.2%),
+    radial-gradient(circle at 63% 64%, rgba(255,180,84,.9) 0 4%, transparent 4.7%),
+    radial-gradient(circle at 76% 55%, rgba(255,122,144,.8) 0 3%, transparent 3.6%),
+    radial-gradient(circle at 88% 63%, rgba(255,236,190,.9) 0 3.4%, transparent 4%),
+    linear-gradient(180deg,#2a1d3f 0%,#4a2c48 38%,#7a4a4a 58%,#2a1f2e 59%,#17111f 100%);
+}
+.bg::after{content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,transparent 18%,rgba(15,10,22,.75) 18% 24%,transparent 24% 70%,rgba(15,10,22,.8) 70% 78%,transparent 78%),
+    linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.45));
+  mix-blend-mode:multiply;opacity:.55}
+.veil{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at center,rgba(27,20,38,.1),rgba(27,20,38,.6))}
+
+/* ---- Sekmeler (sol üst) ---- */
+nav{position:fixed;top:0;left:0;z-index:5;padding:20px 24px;display:flex;gap:8px}
+.tab{font:500 1rem var(--sans);color:var(--ink);background:var(--glass);border:1px solid var(--line);
+  padding:9px 20px;border-radius:999px;cursor:pointer;text-decoration:none;backdrop-filter:blur(10px);
+  transition:background .2s,color .2s}
+.tab:hover{background:rgba(251,241,227,.18)}
+.tab[aria-current="page"]{background:var(--ink);color:var(--night)}
+.tab:focus-visible,.post:focus-visible,.back:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+
+/* ---- Açılış ---- */
+.home{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
+.home h1{font-family:var(--serif);font-variation-settings:"SOFT" 100,"opsz" 144;font-weight:800;
+  font-size:clamp(3.2rem,12vw,9rem);line-height:.95;letter-spacing:-.02em;
+  text-shadow:0 6px 40px rgba(27,20,38,.55);animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+
+/* ---- Karalamalar listesi ---- */
+.wrap{max-width:720px;margin:0 auto;padding:96px 20px 80px}
+.wrap>h2{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:700;font-size:clamp(2rem,6vw,3rem);margin-bottom:24px}
+.list{display:flex;flex-direction:column;gap:14px}
+.post{display:flex;gap:18px;align-items:stretch;background:var(--glass);border:1px solid var(--line);
+  border-radius:28px;padding:22px 26px;backdrop-filter:blur(14px);cursor:pointer;color:inherit;text-decoration:none;
+  transition:background .2s,transform .2s}
+.post:hover{background:rgba(27,20,38,.72);transform:translateY(-2px)}
+.post .t{flex:1;min-width:0}
+.post h3{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:700;font-size:1.5rem;line-height:1.2;margin-bottom:4px}
+.date{font-size:.85rem;color:var(--ink-soft);margin-bottom:8px}
+.excerpt{color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.post img{width:96px;height:96px;object-fit:cover;border-radius:20px;flex:none}
+.empty{color:var(--ink-soft)}
+
+/* ---- Tek yazı ---- */
+.article{background:var(--glass);border:1px solid var(--line);border-radius:32px;padding:clamp(24px,5vw,48px);backdrop-filter:blur(16px)}
+.article h2{font-family:var(--serif);font-variation-settings:"SOFT" 100;font-weight:800;font-size:clamp(2rem,6vw,3.2rem);line-height:1.1;margin-bottom:6px}
+.article .body{margin-top:24px;font-family:var(--serif);font-size:1.15rem;line-height:1.8;max-width:62ch}
+.article .body p{margin-bottom:1.2em}
+.article img{max-width:100%;border-radius:22px;display:block;margin:1.4em 0}
+.back{display:inline-block;margin-bottom:18px;color:var(--ink);background:none;border:0;font:500 1rem var(--sans);cursor:pointer;padding:4px 0}
+.back:hover{color:var(--amber)}
+
+@media (max-width:520px){.post{padding:18px}.post img{width:72px;height:72px}nav{padding:14px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
+
+<nav aria-label="Ana gezinme">
+  <a class="tab" href="#karalamalar" id="tab-kar">Karalamalar</a>
+</nav>
+
+<main id="app"></main>
+
+<script src="posts.js"></script>
+<script>
+const app = document.getElementById("app");
+const tab = document.getElementById("tab-kar");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = d => { const x = new Date(d); return isNaN(x) ? "" : x.toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"}); };
+const posts = () => (window.POSTS || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+const plain = t => t.replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\s+/g," ").trim();
+
+function home(){
+  tab.removeAttribute("aria-current");
+  document.title = "Tombul Dergi";
+  app.innerHTML = '<section class="home"><h1>Tombul Dergi</h1></section>';
+}
+
+function list(){
+  tab.setAttribute("aria-current","page");
+  document.title = "Karalamalar — Tombul Dergi";
+  const items = posts().map(p => `
+    <a class="post" href="#yazi-${esc(p.id)}">
+      <div class="t">
+        <h3>${esc(p.title)}</h3>
+        <div class="date">${fmt(p.date)}</div>
+        <p class="excerpt">${esc(plain(p.content))}</p>
+      </div>
+      ${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : ""}
+    </a>`).join("");
+  app.innerHTML = `<div class="wrap"><h2>Karalamalar</h2><div class="list">${items || '<p class="empty">Henüz yazı yok.</p>'}</div></div>`;
+}
+
+function body(content){
+  return content.split(/\n\s*\n/).map(block => {
+    const m = block.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (m) return `<img src="${esc(m[2])}" alt="${esc(m[1])}" loading="lazy">`;
+    return `<p>${esc(block.trim()).replace(/\n/g,"<br>")}</p>`;
+  }).join("");
+}
+
+function single(id){
+  const p = posts().find(x => x.id === id);
+  if (!p) return list();
+  tab.setAttribute("aria-current","page");
+  document.title = p.title + " — Tombul Dergi";
+  app.innerHTML = `<div class="wrap"><a class="back" href="#karalamalar">← Karalamalar</a>
+    <article class="article"><h2>${esc(p.title)}</h2><div class="date">${fmt(p.date)}</div>
+    ${p.cover ? `<img src="${esc(p.cover)}" alt="">` : ""}
+    <div class="body">${body(p.content)}</div></article></div>`;
+}
+
+function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("yazi-")) single(h.slice(5));
+  else if (h === "karalamalar") list();
+  else home();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
