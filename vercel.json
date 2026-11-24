@@ -1,4 +1,10 @@
 {
   "framework": "vite",
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
+  "functions": {
+    "api/clean-images.js": { "experimentalTriggers": [{ "type": "schedule/v1beta" }] }
+  },
+  "schedules": {
+    "clean-images": { "schedule": "0 4 * * *", "timezone": "Europe/Istanbul", "function": "api/clean-images" }
+  }
 }
