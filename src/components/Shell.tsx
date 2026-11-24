@@ -13,7 +13,7 @@ export function Brand({ size = 26 }: { size?: number }) {
   return (
     <Link to="/" className="brand" aria-label="Tombul Dergi, akışa dön">
       <Bottle size={size} />
-      <span aria-hidden="true">tombul</span>
+      <span aria-hidden="true">Tombul Dergi</span>
     </Link>
   );
 }
@@ -101,7 +101,7 @@ function Aside() {
       <form role="search" onSubmit={search}>
         <label className="sr-only" htmlFor="aside-q">Yazı ya da yazar ara</label>
         <div style={{ position: "relative" }}>
-          <input id="aside-q" className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Yazı ya da yazar ara" style={{ paddingLeft: 44, borderRadius: 999 }} />
+          <input id="aside-q" className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Yazı ya da yazar ara" style={{ paddingLeft: 44 }} />
           <span style={{ position: "absolute", left: 16, top: 14, color: "var(--muted)" }}><Icon name="search" /></span>
         </div>
       </form>

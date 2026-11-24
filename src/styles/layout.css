@@ -4,15 +4,15 @@
 .shell main { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 
 .rail { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 4px; max-height: calc(100vh - 40px); }
-.brand { display: flex; align-items: center; gap: 8px; padding: 0 12px 18px; color: var(--ink); font-weight: 900; font-size: 26px; letter-spacing: -0.03em; }
+.brand { display: flex; align-items: center; gap: 8px; padding: 0 12px 18px; color: var(--ink); font-weight: 700; font-size: 26px; letter-spacing: -0.01em; }
 .brand:hover { color: var(--ink); }
-.rail-link { display: flex; align-items: center; gap: 14px; min-height: 50px; padding: 0 16px; border-radius: 16px; color: var(--ink); font-weight: 600; font-size: 17px; transition: background-color 0.15s; }
+.rail-link { display: flex; align-items: center; gap: 14px; min-height: 50px; padding: 0 16px; border-radius: var(--r-field); color: var(--ink); font-weight: 600; font-size: 17px; transition: background-color 0.15s; }
 .rail-link:hover { background: var(--surface); color: var(--ink); }
 .rail-link.active { background: var(--surface); box-shadow: var(--shadow); font-weight: 700; }
 .rail-link .icon { width: 22px; height: 22px; }
 .rail-write { margin-top: 14px; }
 .rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 16px; }
-.me-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); color: var(--ink); }
+.me-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-field); background: var(--surface); box-shadow: var(--shadow); color: var(--ink); }
 .me-chip:hover { color: var(--ink); }
 .me-chip span { display: flex; flex-direction: column; min-width: 0; }
 .me-chip strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -37,7 +37,7 @@
   .topbar { display: flex; position: sticky; top: 0; z-index: 30; align-items: center; gap: 8px; padding: 10px var(--gutter); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   .topbar .brand { padding: 0; font-size: 22px; flex: 1; }
   .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
-  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 52px; justify-content: center; color: var(--muted); font-size: 12px; font-weight: 600; border-radius: 14px; }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 52px; justify-content: center; color: var(--muted); font-size: 12px; font-weight: 600; border-radius: var(--r-field); }
   .tabbar a.active { color: var(--primary); }
   .tabbar a.tab-write { color: var(--on-primary); }
   .tabbar a.tab-write .icon { width: 44px; height: 44px; padding: 10px; border-radius: 50%; background: var(--primary); }

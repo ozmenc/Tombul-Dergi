@@ -2,7 +2,7 @@ import { must, postJson, supabase } from "./client";
 import type { Profile, Role } from "../types";
 import { UUID_RE } from "../format";
 
-const PROFILE_FIELDS = "id,name,bio,avatar_url,role,created_at";
+const PROFILE_FIELDS = "id,name,bio,avatar_url,role,created_at,name_changed_at";
 
 export const getProfile = async (id: string) =>
   must<Profile | null>(await supabase.from("profiles").select(PROFILE_FIELDS).eq("id", id).maybeSingle());
@@ -53,6 +53,12 @@ export async function applyForAuthor(id: string) {
 
 export const listMembers = async () =>
   must<Profile[]>(await supabase.from("profiles").select(PROFILE_FIELDS).order("created_at", { ascending: false }));
+
+/** Admin: üye kimliği → e-posta (supabase/005_members.sql). */
+export async function listMemberEmails() {
+  const rows = must<{ id: string; email: string }[]>(await supabase.rpc("member_emails"));
+  return new Map(rows.map((r) => [r.id, r.email]));
+}
 
 export async function setRole(id: string, role: Role) {
   must(await supabase.from("profiles").update({ role }).eq("id", id));

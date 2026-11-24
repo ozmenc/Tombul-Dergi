@@ -8,11 +8,11 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 - **Keşfet** (`/kesfet?q=…&kategori=…&etiket=…`): yazı ve yazar araması, kategoriler, etiketler.
 - **Yazı** (`/yazi/:slug`): Markdown metin, beğen / beğenme, kaydet, paylaş, yorumlar ve yanıtlar, sıradaki yazılar.
 - **Yazarlar** (`/yazarlar`, `/yazar/:id`): takip et, takipçi ve yazı sayıları.
-- **Kaydettiklerim** (`/kaydedilenler`), **Hesabım** (`/hesap`): profil, fotoğraf, şifre, yazarlık başvurusu.
+- **Kaydettiklerim** (`/kaydedilenler`), **Hesabım** (`/hesap`): profil, fotoğraf, şifre, yazarlık başvurusu. Ad 30 günde bir değişir (admin hariç).
 - **Giriş / kayıt** (`/giris`, `/kayit`): kayıtta "yazar olmak istiyorum" seçilebilir.
 - **Şifremi unuttum** (`/sifremi-unuttum` → e-posta → `/sifre-yenile`).
-- **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, öne çıkarma).
-  Admin ayrıca kategorileri, üyeleri (başvuru onayı, roller, yazar ekleme, şifre sıfırlama) ve yorumları (gizle / sil) yönetir.
+- **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, resim boyutu: `![](url "küçük")` / `"orta"`, öne çıkarma yalnızca admin).
+  Admin ayrıca kategorileri, üyeleri (e-postalar, başvuru onayı, roller, yazar ekleme, şifre sıfırlama) ve yorumları (gizle / sil) yönetir.
 - Aydınlık ve koyu tema; her sayfada yükleniyor, boş, hata ve 404 durumları.
 - Maskot: `src/components/Bottle.tsx` (gözleri imleci izler; sevinç, üzgün, utangaç, dolum, devrik halleri).
 
@@ -49,7 +49,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
 **Site URL** canlı adres olmalı, **Redirect URLs** listesinde `https://<canlı adres>/sifre-yenile` bulunmalı.

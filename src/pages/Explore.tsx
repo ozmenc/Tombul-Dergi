@@ -59,7 +59,7 @@ export default function Explore() {
         <form role="search" onSubmit={(e) => e.preventDefault()} style={{ position: "relative" }}>
           <label className="sr-only" htmlFor="explore-q">Yazı, yazar ya da konu ara</label>
           <input id="explore-q" className="input" type="search" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Yazı, yazar ya da konu ara"
-            autoFocus style={{ paddingLeft: 48, minHeight: 56, borderRadius: 999, fontSize: 17 }} />
+            autoFocus style={{ paddingLeft: 48, minHeight: 56, fontSize: 17 }} />
           <span style={{ position: "absolute", left: 18, top: 18, color: "var(--muted)" }}><Icon name="search" /></span>
         </form>
         {cats.status === "success" && (

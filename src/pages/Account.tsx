@@ -4,6 +4,7 @@ import { applyForAuthor, updateProfile } from "../lib/api/people";
 import { IMAGE_TYPES, uploadImage } from "../lib/api/storage";
 import { supabase } from "../lib/supabase";
 import { signOut, useAuth } from "../lib/auth";
+import { fmtDate } from "../lib/format";
 import { useTitle } from "../lib/useTitle";
 import { ROLE_LABEL, type Profile } from "../lib/types";
 import { Avatar } from "../components/Avatar";
@@ -48,6 +49,10 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
     finally { setUploading(false); }
   }
 
+  // Admin dışındakiler adını 30 günde bir değiştirebilir (supabase/005_members.sql).
+  const unlock = me.name_changed_at ? new Date(Date.parse(me.name_changed_at) + 30 * 864e5) : null;
+  const nameLockedUntil = me.role !== "admin" && unlock && unlock.getTime() > Date.now() ? unlock.toISOString() : null;
+
   async function saveProfile(e: FormEvent) {
     e.preventDefault();
     if (!profile.name.trim()) return setError("Adını yaz.");
@@ -82,7 +87,9 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
             {profile.avatar_url && <button type="button" className="linkish" onClick={() => setProfile((p) => ({ ...p, avatar_url: "" }))}>Fotoğrafı kaldır</button>}
           </div>
         </div>
-        <label className="field"><span>Ad</span><input value={profile.name} onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))} maxLength={80} required /></label>
+        <label className="field"><span>Ad</span><input value={profile.name} onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))} maxLength={80} required disabled={!!nameLockedUntil} />
+          <small className="help">{nameLockedUntil ? `Adını ${fmtDate(nameLockedUntil)} tarihinden sonra yeniden değiştirebilirsin.` : me.role === "admin" ? "Adını istediğin zaman değiştirebilirsin." : "Adını 30 günde bir değiştirebilirsin."}</small>
+        </label>
         <label className="field"><span>Hakkında</span><textarea rows={3} value={profile.bio} onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))} maxLength={600} /></label>
         {error && <p className="form-error" role="alert">{error}</p>}
         <button className="btn btn-primary" disabled={saving || uploading}>{saving ? "Kaydediliyor…" : "Profili kaydet"}</button>

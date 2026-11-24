@@ -41,15 +41,15 @@ export function logoInner({ ring = true, label = true, face = true }: LogoParts 
   return [
     ring ? `<circle cx="160" cy="395" r="166" fill="none" stroke="${COBALT}" stroke-width="6"/><circle cx="160" cy="395" r="154" fill="none" stroke="${COBALT}" stroke-width="2.5"/>` : "",
     `<path d="${BOTTLE}" fill="${AMBER}" stroke="${INK}" stroke-width="10" stroke-linejoin="round"/>`,
-    `<rect x="118" y="64" width="84" height="26" rx="9" fill="${COBALT}" stroke="${INK}" stroke-width="7"/>`,
+    `<rect x="118" y="64" width="84" height="26" rx="3" fill="${COBALT}" stroke="${INK}" stroke-width="7"/>`,
     `<path d="${CAP}" fill="${COBALT}" stroke="${INK}" stroke-width="8" stroke-linejoin="round"/>`,
     [131, 146, 160, 174, 189].map((x) => line(`M${x} 26L${x} 36`, 3.5, CREAM)).join(""),
     line("M141 100L141 134C141 172 88 196 72 246", 7, AMBER_LIGHT),
     line("M56 294L56 310", 6, AMBER_LIGHT),
     label ? [
       `<path d="M108 362Q108 340 132 340L188 340Q212 340 212 362" fill="${COBALT}" stroke="${SILVER}" stroke-width="4"/>`,
-      `<rect x="60" y="354" width="200" height="108" rx="50" fill="${COBALT}" stroke="${SILVER}" stroke-width="6"/>`,
-      `<rect x="69" y="363" width="182" height="90" rx="42" fill="none" stroke="${SILVER}" stroke-width="1.8"/>`,
+      `<rect x="60" y="354" width="200" height="108" rx="8" fill="${COBALT}" stroke="${SILVER}" stroke-width="6"/>`,
+      `<rect x="69" y="363" width="182" height="90" rx="4" fill="none" stroke="${SILVER}" stroke-width="1.8"/>`,
       `<path d="${TOMBUL}" fill="${INK}" transform="translate(1.8 1.8)"/><path d="${TOMBUL}" fill="${CREAM}"/>`,
       `<path d="${DERGI}" fill="${CREAM}"/>`,
       wheat(106, -1), wheat(214, 1),

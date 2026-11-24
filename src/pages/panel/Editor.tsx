@@ -8,7 +8,7 @@ import { errorCode } from "../../lib/api/client";
 import { useAsync } from "../../lib/useAsync";
 import { useTitle } from "../../lib/useTitle";
 import { SLUG_RE, normalizeTag, parseTags, readingMinutes, slugify } from "../../lib/format";
-import { renderMarkdown } from "../../lib/markdown";
+import { IMAGE_SIZES, renderMarkdown, type ImageSize } from "../../lib/markdown";
 import type { Category, Post } from "../../lib/types";
 import { Icon } from "../../components/Icon";
 import { useToast } from "../../components/Toast";
@@ -44,6 +44,7 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
   const [v, setV] = useState<PostInput>(saved);
   const [slugTouched, setSlugTouched] = useState(!!initial);
   const [tagDraft, setTagDraft] = useState("");
+  const [imgSize, setImgSize] = useState<ImageSize>("geniş");
   const [tab, setTab] = useState<"write" | "preview">("write");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<"" | "cover" | "inline">("");
@@ -91,7 +92,8 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
       else {
         const at = textarea.current?.selectionStart ?? v.content.length;
         const before = v.content.slice(0, at).trimEnd(), after = v.content.slice(at).trimStart();
-        set("content", [before, `![](${url})`, after].filter(Boolean).join("\n\n"));
+        const image = imgSize === "geniş" ? `![](${url})` : `![](${url} "${imgSize}")`;
+        set("content", [before, image, after].filter(Boolean).join("\n\n"));
       }
       toast("success", kind === "cover" ? "Kapak yüklendi." : "Resim metne eklendi.");
     } catch (err) {
@@ -153,6 +155,11 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
             <Icon name="image" />{uploading === "inline" ? "Yükleniyor…" : "Resim ekle"}
             <input type="file" accept={IMAGE_TYPES.join(",")} className="sr-only" disabled={!!uploading} onChange={(e) => onUpload(e, "inline")} />
           </label>
+          <label className="sr-only" htmlFor="ed-img-size">Eklenecek resmin boyutu</label>
+          <select id="ed-img-size" className="input role-select" value={imgSize} onChange={(e) => setImgSize(e.target.value as ImageSize)}
+            title='Eklenmiş bir resmin boyutunu değiştirmek için metinde ![](…) satırının sonuna "küçük" ya da "orta" yaz'>
+            {(Object.keys(IMAGE_SIZES) as ImageSize[]).map((k) => <option key={k} value={k}>{k[0].toLocaleUpperCase("tr-TR") + k.slice(1)}</option>)}
+          </select>
         </div>
         <label className="sr-only" htmlFor="ed-title">Başlık</label>
         <input id="ed-title" className="editor-title" value={v.title} maxLength={200} placeholder="Başlık"

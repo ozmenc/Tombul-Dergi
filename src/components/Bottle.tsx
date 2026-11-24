@@ -84,9 +84,9 @@ export function Bottle({ mood = "idle", size = 80, track = true, playful = false
         <path className="bt-shine" d="M20 84V126" />
         <g className="bt-cap">
           <path d="M28 16H52V28L49 31L46 28L43 31L40 28L37 31L34 28L31 31L28 28Z" />
-          <rect x="29" y="12" width="22" height="6" rx="3" />
+          <rect x="29" y="12" width="22" height="6" rx="1" />
         </g>
-        <rect className="bt-label" x="17" y="98" width="46" height="28" rx="9" />
+        <rect className="bt-label" x="17" y="98" width="46" height="28" rx="2" />
         <text className="bt-label-text" x="40" y="116.5" textAnchor="middle">TOMBUL</text>
         <g className="bt-face">
           {mood === "sad" && <path className="bt-brow" d="M26 63 L35 66 M54 63 L45 66" />}

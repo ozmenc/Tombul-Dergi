@@ -7,18 +7,18 @@ a { color: var(--primary); text-decoration: none; }
 a:hover { color: var(--primary-hover); }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 10px; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: var(--r-field); }
 ::selection { background: var(--amber); color: #15183a; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: var(--r-field); }
 .skip:focus { top: 12px; color: var(--bg); }
 .muted { color: var(--muted); }
-h1, h2, h3 { line-height: 1.12; letter-spacing: -0.02em; }
+h1, h2, h3, .post-title, .brand { font-family: var(--display); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
 
 /* ---------- Düğmeler ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
-  border-radius: 999px; border: 0; background: var(--surface-2); color: var(--ink); font-weight: 600; white-space: nowrap;
+  border-radius: var(--r-field); border: 0; background: var(--surface-2); color: var(--ink); font-weight: 600; white-space: nowrap;
   transition: transform 0.12s var(--ease-out), background-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 a.btn { color: var(--ink); }
@@ -61,14 +61,14 @@ a.btn { color: var(--ink); }
 /* ---------- Kartlar ve rozetler ---------- */
 .card { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow); }
 .chip {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: var(--r-field);
   background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); font-weight: 600; font-size: 14px; white-space: nowrap;
   transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 a.chip { color: var(--ink); }
 .chip:hover { border-color: var(--ink); color: var(--ink); }
 .chip.on, .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.badge { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: var(--r-field); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
 .badge-amber { background: var(--amber-soft); color: var(--amber-ink); }
 .badge-blue { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
 .badge-mint { background: var(--mint-soft); color: var(--mint); }
@@ -76,8 +76,8 @@ a.chip { color: var(--ink); }
 .badge-muted { background: var(--surface-2); color: var(--muted); }
 .badge-ink { background: var(--ink); color: var(--bg); }
 
-.segmented { display: inline-flex; gap: 4px; padding: 5px; background: var(--surface); border-radius: 999px; box-shadow: var(--shadow); flex-wrap: wrap; }
-.segmented button, .segmented a { min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--ink); font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
+.segmented { display: inline-flex; gap: 4px; padding: 5px; background: var(--surface); border-radius: var(--r-field); box-shadow: var(--shadow); flex-wrap: wrap; }
+.segmented button, .segmented a { min-height: 38px; padding: 0 16px; border: 0; border-radius: var(--r-field); background: none; color: var(--ink); font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
 .segmented button span, .segmented a span { opacity: 0.6; }
 .segmented [aria-pressed="true"], .segmented [aria-selected="true"], .segmented a.active { background: var(--ink); color: var(--bg); }
 

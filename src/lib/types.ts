@@ -1,6 +1,6 @@
 export type Role = "reader" | "pending" | "author" | "admin";
 
-export type Profile = { id: string; name: string; bio: string; avatar_url: string; role: Role; created_at: string };
+export type Profile = { id: string; name: string; bio: string; avatar_url: string; role: Role; created_at: string; name_changed_at: string | null };
 
 /** Yazı ve yorumlarda gösterilen kısa profil. */
 export type PersonRef = { id: string; name: string; avatar_url: string };

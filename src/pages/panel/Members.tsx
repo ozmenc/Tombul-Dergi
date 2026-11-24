@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { AdminOnly, PanelHead, usePanel } from "./PanelLayout";
-import { createAuthor, listMembers, resetPassword, setRole } from "../../lib/api/people";
+import { createAuthor, listMemberEmails, listMembers, resetPassword, setRole } from "../../lib/api/people";
 import { useAsync } from "../../lib/useAsync";
 import { useTitle } from "../../lib/useTitle";
 import { EMAIL_RE, fmtRelative } from "../../lib/format";
@@ -24,14 +24,17 @@ function MemberManager() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("sekme") === "basvuru" ? "basvuru" : "hepsi";
   const [q, setQ] = useState("");
-  const [state, retry, setState] = useAsync(listMembers, []);
+  const [state, retry, setState] = useAsync(async () => {
+    const [members, emails] = await Promise.all([listMembers(), listMemberEmails()]);
+    return members.map((m) => ({ ...m, email: emails.get(m.id) ?? "" }));
+  }, []);
   const [busyId, setBusyId] = useState("");
 
   const list = state.status === "success" ? state.data : [];
   const pending = list.filter((m) => m.role === "pending");
   const shown = useMemo(() => {
     const term = q.trim().toLocaleLowerCase("tr-TR");
-    return (tab === "basvuru" ? pending : list).filter((m) => !term || m.name.toLocaleLowerCase("tr-TR").includes(term));
+    return (tab === "basvuru" ? pending : list).filter((m) => !term || m.name.toLocaleLowerCase("tr-TR").includes(term) || m.email.toLowerCase().includes(term));
   }, [list, pending, tab, q]);
 
   async function change(m: Profile, role: Role, done: string) {
@@ -56,7 +59,7 @@ function MemberManager() {
               </button>
             ))}
           </div>
-          <label className="search-mini"><Icon name="search" /><span className="sr-only">İsimde ara</span><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="İsimde ara" /></label>
+          <label className="search-mini"><Icon name="search" /><span className="sr-only">İsim ya da e-postada ara</span><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="İsim ya da e-posta" /></label>
         </div>
         {state.status === "loading" && <ListSkeleton rows={4} />}
         {state.status === "error" && <ErrorState title="Üyeler yüklenemedi" error={state.error} onRetry={retry} />}
@@ -67,7 +70,7 @@ function MemberManager() {
               {shown.map((m) => (
                 <li key={m.id} className="row">
                   <Avatar person={m} size={40} />
-                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"}</strong><small>{fmtRelative(m.created_at)} katıldı</small></span>
+                  <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
                   {m.role === "pending" ? (
                     <>
                       <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id} onClick={() => change(m, "author", `${m.name} artık yazar.`)}><Icon name="check" /> Onayla</button>

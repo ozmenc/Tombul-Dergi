@@ -51,7 +51,7 @@
 .bottle-shy .bt-body { transform: rotate(4deg); transition: transform 0.3s var(--ease-back); }
 
 /* dokununca */
-.bottle-hit { padding: 0; border: 0; background: none; border-radius: 30px; display: inline-flex; }
+.bottle-hit { padding: 0; border: 0; background: none; border-radius: var(--r-card); display: inline-flex; }
 .bottle-hit:hover .bt-body { animation: bt-wobble 0.7s var(--ease-out); }
 .popping .bt-body { animation: bt-jump 0.75s var(--ease-back); }
 .popping .bt-foam { animation: bt-foam 0.75s ease-out; transform-origin: 50% 100%; }
