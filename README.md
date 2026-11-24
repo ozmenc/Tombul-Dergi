@@ -31,7 +31,7 @@ Yetkiler tarayıcıda değil, Supabase RLS kurallarında (`supabase/*.sql`).
 - `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı alanı var.
 - `authors.js`: admin yazar hesabı açar.
 - `password.js`: admin bir üyeye yeni geçici şifre üretir (e-postayla sıfırlama olmadığı için).
-- `_supabase.js`: ikisinin ortak yardımcıları (fonksiyon olarak yayınlanmaz).
+- `_supabase.js`: fonksiyonların ortak yardımcıları (fonksiyon olarak yayınlanmaz).
 
 ## Geliştirme
 
