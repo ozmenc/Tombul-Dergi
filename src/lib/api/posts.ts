@@ -27,10 +27,10 @@ export async function withSocial(posts: Post[]): Promise<FeedPost[]> {
 
 export type FeedFilter = { categoryId?: string; tag?: string; authorId?: string; authorIds?: string[]; ids?: string[]; q?: string; limit?: number };
 
-// shortcut: sayfalama yok, en fazla `limit` (varsayılan 60) yazı; yazı sayısı yüzleri geçince "daha fazla yükle" ekle.
+/** Yayındaki yazılar, yeniden eskiye; en fazla `limit` tane (sayfalama usePaged ile). */
 export async function listPublished(f: FeedFilter = {}): Promise<FeedPost[]> {
   if (f.authorIds?.length === 0 || f.ids?.length === 0) return [];
-  let q = supabase.from("posts").select(POST_FIELDS).eq("status", "published").order("published_at", { ascending: false }).limit(f.limit ?? 60);
+  let q = supabase.from("posts").select(POST_FIELDS).eq("status", "published").order("published_at", { ascending: false }).limit(f.limit ?? 20);
   if (f.categoryId) q = q.eq("category_id", f.categoryId);
   if (f.tag) q = q.contains("tags", [f.tag]);
   if (f.authorId) q = q.eq("author_id", f.authorId);

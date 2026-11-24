@@ -25,6 +25,11 @@ export function ListSkeleton({ rows = 4 }: { rows?: number }) {
   );
 }
 
+export function LoadMore({ hasMore, busy, onMore }: { hasMore: boolean; busy: boolean; onMore: () => void }) {
+  if (!hasMore) return null;
+  return <button type="button" className="btn btn-block btn-lg" onClick={onMore} disabled={busy}>{busy ? "Yükleniyor…" : "Daha fazla göster"}</button>;
+}
+
 /** Şişe dolarken: bir şey yükleniyor. */
 export function Spinner({ label = "Yükleniyor" }: { label?: string }) {
   return (

@@ -4,13 +4,14 @@ import { listPopularTags, listPublished } from "../lib/api/posts";
 import { searchAuthors } from "../lib/api/people";
 import { listCategories } from "../lib/api/categories";
 import { useAsync } from "../lib/useAsync";
+import { usePaged } from "../lib/usePaged";
 import { useTitle } from "../lib/useTitle";
 import { sanitizeSearch } from "../lib/format";
 import { Avatar } from "../components/Avatar";
 import { FollowButton } from "../components/Actions";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
-import { EmptyState, ErrorState, FeedSkeleton } from "../components/States";
+import { EmptyState, ErrorState, FeedSkeleton, LoadMore } from "../components/States";
 
 /** Arama, kategoriler ve etiketler. Filtreler adres çubuğunda: ?q=…&kategori=…&etiket=… */
 export default function Explore() {
@@ -38,8 +39,8 @@ export default function Explore() {
   const categoryId = cats.status === "success" ? cats.data.find((c) => c.slug === cat)?.id : undefined;
   const waitingForCategory = !!cat && cats.status === "loading";
   const term = sanitizeSearch(q);
-  const [posts, retry] = useAsync(
-    () => (waitingForCategory ? new Promise<never>(() => {}) : listPublished({ q: term, tag: tag ?? undefined, categoryId })),
+  const { state: posts, retry, more, hasMore, moreBusy } = usePaged(
+    (limit) => (waitingForCategory ? new Promise<never>(() => {}) : listPublished({ q: term, tag: tag ?? undefined, categoryId, limit })),
     [term, tag, categoryId, waitingForCategory]
   );
   const [people] = useAsync(() => (term ? searchAuthors(term) : Promise.resolve([])), [term]);
@@ -104,8 +105,9 @@ export default function Explore() {
       {posts.status === "success" && (posts.data.length === 0
         ? <EmptyState title={filtered ? "Bununla ilgili bir şey bulamadık" : "Henüz yayında yazı yok"}>{filtered ? "Başka bir kelime dene ya da filtreleri kaldır." : "Birazdan yine uğra."}</EmptyState>
         : <>
-            {filtered && <p className="muted">{posts.data.length} yazı bulundu</p>}
+            {filtered && <p className="muted">{hasMore ? `${posts.data.length}+` : posts.data.length} yazı bulundu</p>}
             {posts.data.map((p) => <PostCard key={p.id} post={p} />)}
+            <LoadMore hasMore={hasMore} busy={moreBusy} onMore={more} />
           </>)}
     </>
   );

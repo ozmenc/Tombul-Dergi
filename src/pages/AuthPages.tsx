@@ -82,7 +82,7 @@ export function Login() {
         <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Giriş yapılıyor…" : "Giriş yap"}</button>
       </form>
       <p className="auth-switch">Hesabın yok mu? <Link to={`/kayit${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}>Kayıt ol</Link></p>
-      <p className="help">Şifreni unuttuysan dergi yönetimine yaz; yeni bir geçici şifre verirler.</p>
+      <p className="help">Şifreni mi unuttun? Dergi yönetimine yaz; panelden sana yeni bir geçici şifre üretirler.</p>
     </AuthLayout>
   );
 }

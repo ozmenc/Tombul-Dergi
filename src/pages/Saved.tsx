@@ -13,7 +13,7 @@ export default function Saved() {
   const { saved, ready } = useSocial();
   const ids = [...saved];
   // Kayıttan çıkarılan yazı listeden hemen düşsün diye listeyi kaydedilen kümeden süzüyoruz; yeniden çekmiyoruz.
-  const [state, retry] = useAsync(() => (auth.status === "signed-in" && ready ? listPublished({ ids }) : Promise.resolve([])), [auth.status, ready]);
+  const [state, retry] = useAsync(() => (auth.status === "signed-in" && ready ? listPublished({ ids, limit: Math.max(1, ids.length) }) : Promise.resolve([])), [auth.status, ready]);
 
   if (auth.status === "loading" || (auth.status === "signed-in" && !ready)) return <FeedSkeleton rows={2} />;
   if (auth.status !== "signed-in")

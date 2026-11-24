@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import { AdminOnly, PanelHead, usePanel } from "./PanelLayout";
-import { createAuthor, listMembers, setRole } from "../../lib/api/people";
+import { createAuthor, listMembers, resetPassword, setRole } from "../../lib/api/people";
 import { useAsync } from "../../lib/useAsync";
 import { useTitle } from "../../lib/useTitle";
 import { EMAIL_RE, fmtRelative } from "../../lib/format";
@@ -83,6 +83,7 @@ function MemberManager() {
                       </select>
                     </>
                   )}
+                  {m.id !== me.id && <PasswordReset member={m} />}
                 </li>
               ))}
             </ul>
@@ -90,6 +91,40 @@ function MemberManager() {
       </section>
       <AddAuthor onAdded={retry} />
     </>
+  );
+}
+
+/** Üyeye yeni geçici şifre üretir ve bir kez gösterir (e-postayla sıfırlama yok). */
+function PasswordReset({ member }: { member: Profile }) {
+  const toast = useToast();
+  const [armed, setArmed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [password, setPassword] = useState("");
+
+  async function reset() {
+    if (!armed) { setArmed(true); setTimeout(() => setArmed(false), 4000); return; }
+    setBusy(true);
+    try { setPassword(await resetPassword(member.id)); setArmed(false); }
+    catch (err) { toast("error", (err as Error).message); }
+    finally { setBusy(false); }
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(password); toast("success", "Şifre kopyalandı."); }
+    catch { toast("error", "Kopyalanamadı; şifreyi elle seç."); }
+  }
+
+  if (password)
+    return (
+      <span className="new-password" role="status">
+        <span>Yeni şifre: <code>{password}</code></span>
+        <button type="button" className="btn btn-sm" onClick={copy}><Icon name="link" /> Kopyala</button>
+        <button type="button" className="btn btn-sm btn-ghost" onClick={() => setPassword("")} aria-label="Gizle"><Icon name="close" /></button>
+      </span>
+    );
+  return (
+    <button type="button" className={`btn btn-sm ${armed ? "btn-danger" : "btn-ghost"}`} onClick={reset} disabled={busy}>
+      {busy ? "Sıfırlanıyor…" : armed ? "Eminim, sıfırla" : "Şifre sıfırla"}
+    </button>
   );
 }
 

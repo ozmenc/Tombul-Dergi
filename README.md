@@ -4,14 +4,14 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 
 ## Neler var
 
-- **Akış** (`/`): yazar halkaları, "Senin için / Takip ettiklerin / Popüler", kategori filtresi.
+- **Akış** (`/`): yazar halkaları, "Senin için / Takip ettiklerin / Popüler", kategori filtresi, "Daha fazla göster".
 - **Keşfet** (`/kesfet?q=…&kategori=…&etiket=…`): yazı ve yazar araması, kategoriler, etiketler.
 - **Yazı** (`/yazi/:slug`): Markdown metin, beğen / beğenme, kaydet, paylaş, yorumlar ve yanıtlar, sıradaki yazılar.
 - **Yazarlar** (`/yazarlar`, `/yazar/:id`): takip et, takipçi ve yazı sayıları.
 - **Kaydettiklerim** (`/kaydedilenler`), **Hesabım** (`/hesap`): profil, fotoğraf, şifre, yazarlık başvurusu.
 - **Giriş / kayıt** (`/giris`, `/kayit`): kayıtta "yazar olmak istiyorum" seçilebilir.
 - **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, öne çıkarma).
-  Admin ayrıca kategorileri, üyeleri (başvuru onayı, roller, yazar ekleme) ve yorumları (gizle / sil) yönetir.
+  Admin ayrıca kategorileri, üyeleri (başvuru onayı, roller, yazar ekleme, şifre sıfırlama) ve yorumları (gizle / sil) yönetir.
 - Aydınlık ve koyu tema; her sayfada yükleniyor, boş, hata ve 404 durumları.
 - Maskot: `src/components/Bottle.tsx` (gözleri imleci izler; sevinç, üzgün, utangaç, dolum, devrik halleri).
 
@@ -30,6 +30,7 @@ Yetkiler tarayıcıda değil, Supabase RLS kurallarında (`supabase/*.sql`).
 
 - `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı alanı var.
 - `authors.js`: admin yazar hesabı açar.
+- `password.js`: admin bir üyeye yeni geçici şifre üretir (e-postayla sıfırlama olmadığı için).
 - `_supabase.js`: ikisinin ortak yardımcıları (fonksiyon olarak yayınlanmaz).
 
 ## Geliştirme

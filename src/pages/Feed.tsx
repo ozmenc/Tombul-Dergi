@@ -4,6 +4,7 @@ import { listPublished } from "../lib/api/posts";
 import { listAuthors } from "../lib/api/people";
 import { listCategories } from "../lib/api/categories";
 import { useAsync } from "../lib/useAsync";
+import { usePaged } from "../lib/usePaged";
 import { useTitle } from "../lib/useTitle";
 import { useMe } from "../lib/auth";
 import { useSocial } from "../lib/social";
@@ -12,7 +13,7 @@ import { canWrite } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
-import { EmptyState, ErrorState, FeedSkeleton } from "../components/States";
+import { EmptyState, ErrorState, FeedSkeleton, LoadMore } from "../components/States";
 
 type Tab = "senin" | "takip" | "populer";
 const TABS: [Tab, string][] = [["senin", "Senin için"], ["takip", "Takip ettiklerin"], ["populer", "Popüler"]];
@@ -29,18 +30,25 @@ export default function Feed() {
   const [authors] = useAsync(listAuthors, []);
   const categoryId = cats.status === "success" ? cats.data.find((c) => c.slug === cat)?.id : undefined;
   const followIds = [...following].sort().join(",");
-  const waiting = tab === "takip" && !ready;
-  const [posts, retry] = useAsync(
-    () => (waiting ? new Promise<never>(() => {}) : tab === "takip" ? listPublished({ authorIds: [...following], categoryId }) : listPublished({ categoryId })),
+  // Takip listesi ya da kategori kimliği henüz gelmediyse yanlış bir ilk sayfa çekme.
+  const waiting = (tab === "takip" && !ready) || (!!cat && cats.status === "loading");
+  const { state: posts, retry, more, hasMore, moreBusy } = usePaged(
+    async (limit) => {
+      if (waiting) return new Promise<never>(() => {});
+      if (tab === "takip") return listPublished({ authorIds: [...following], categoryId, limit });
+      if (tab === "populer") {
+        // shortcut: popülerlik sayaçlardan hesaplanır; son 200 yazı içinde sıralanır. Yazılar binleri bulunca sunucuda sırala.
+        const all = await listPublished({ categoryId, limit: 200 });
+        return all.sort((a, b) => popularity(b.stats) - popularity(a.stats)).slice(0, limit);
+      }
+      return listPublished({ categoryId, limit });
+    },
     [tab, categoryId, tab === "takip" ? followIds : "", me?.id, waiting]
   );
 
   const shown = useMemo(() => {
     if (posts.status !== "success") return [];
-    const list = [...posts.data];
-    if (tab === "populer") return list.sort((a, b) => popularity(b.stats) - popularity(a.stats));
-    if (tab === "senin") return list.sort((a, b) => Number(b.featured) - Number(a.featured));
-    return list;
+    return tab === "senin" ? [...posts.data].sort((a, b) => Number(b.featured) - Number(a.featured)) : posts.data;
   }, [posts, tab]);
 
   const set = (key: string, value: string | null) => {
@@ -86,7 +94,12 @@ export default function Feed() {
           tab === "takip"
             ? <EmptyState title="Henüz kimseyi takip etmiyorsun" action={<Link className="btn btn-primary" to="/yazarlar">Yazarları keşfet</Link>}>Takip ettiğin yazarların yeni yazıları burada görünür.</EmptyState>
             : <EmptyState title={cat ? "Bu kategoride henüz yazı yok" : "Henüz yayında yazı yok"} action={cat ? <button className="btn" onClick={() => set("kategori", null)}>Tüm yazılar</button> : undefined}>Yazarlar karalamaya devam ediyor. Birazdan yine uğra.</EmptyState>
-        ) : shown.map((p) => <PostCard key={p.id} post={p} />)}
+        ) : (
+          <>
+            {shown.map((p) => <PostCard key={p.id} post={p} />)}
+            <LoadMore hasMore={hasMore} busy={moreBusy} onMore={more} />
+          </>
+        )}
     </>
   );
 }

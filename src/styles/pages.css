@@ -91,6 +91,8 @@ a.row:hover { color: var(--ink); background: var(--surface-2); border-radius: 14
 .inline-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .inline-form .input { flex: 1 1 220px; }
 .role-select { width: auto; min-height: 40px; padding: 6px 12px; }
+.new-password { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 6px 6px 14px; border-radius: 14px; background: var(--amber-soft); color: var(--amber-ink); font-weight: 600; }
+.new-password code { font-size: 15px; user-select: all; }
 .mod-body { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
 .mod-row.is-hidden { opacity: 0.6; }
 

@@ -61,6 +61,9 @@ export async function setRole(id: string, role: Role) {
 /** Servis anahtarı gerektiği için Vercel fonksiyonu üzerinden (api/authors.js). */
 export const createAuthor = (body: { name: string; email: string; password: string }) => postJson("/api/authors", body, true);
 
+/** Admin bir üyeye yeni geçici şifre üretir (api/password.js). */
+export const resetPassword = async (userId: string) => (await postJson("/api/password", { userId }, true)).password as string;
+
 /** Herkese açık kayıt (api/signup.js), ardından oturum açar. */
 export async function signUp(body: { name: string; email: string; password: string; wantsAuthor: boolean; website: string }) {
   await postJson("/api/signup", body);
