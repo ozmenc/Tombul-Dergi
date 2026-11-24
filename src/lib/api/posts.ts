@@ -1,35 +1,53 @@
 import { must, supabase } from "./client";
-import type { Post, PostStatus, Profile } from "../types";
+import type { ListedPost, Post, PostStatus, Profile } from "../types";
 import { SLUG_RE, UUID_RE, sanitizeSearch } from "../format";
 
 const POST_FIELDS =
   "id,slug,title,excerpt,content,cover,tags,featured,author_id,category_id,status,published_at,created_at,updated_at," +
   "author:profiles!posts_author_id_fkey(id,name,avatar_url),category:categories(id,slug,name)";
 
+/** Yazılara tokuşturma sayılarını ekler (tek istek). */
+async function withCheers(posts: Post[]): Promise<ListedPost[]> {
+  if (!posts.length) return [];
+  const rows = must<{ post_id: string; n: number }[]>(await supabase.rpc("cheer_counts", { ids: posts.map((p) => p.id) }));
+  const count = new Map(rows.map((r) => [r.post_id, Number(r.n)]));
+  return posts.map((p) => ({ ...p, cheers: count.get(p.id) ?? 0 }));
+}
+
 export type FeedFilter = { categoryId?: string; tag?: string; authorId?: string; q?: string; limit?: number };
 
 /** Yayındaki yazılar, yeniden eskiye; en fazla `limit` tane (sayfalama usePaged ile). */
-export async function listPublished(f: FeedFilter = {}): Promise<Post[]> {
+export async function listPublished(f: FeedFilter = {}): Promise<ListedPost[]> {
   let q = supabase.from("posts").select(POST_FIELDS).eq("status", "published").order("published_at", { ascending: false }).limit(f.limit ?? 20);
   if (f.categoryId) q = q.eq("category_id", f.categoryId);
   if (f.tag) q = q.contains("tags", [f.tag]);
   if (f.authorId) q = q.eq("author_id", f.authorId);
   const term = f.q ? sanitizeSearch(f.q) : "";
   if (term) q = q.or(`title.ilike.*${term}*,excerpt.ilike.*${term}*,content.ilike.*${term}*`);
-  return must<Post[]>(await q);
+  return withCheers(must<Post[]>(await q));
+}
+
+/** En çok tokuşturulan yazılar, sırasıyla. */
+export async function listMostCheered(limit = 5): Promise<ListedPost[]> {
+  const rows = must<{ post_id: string; n: number }[]>(await supabase.rpc("most_cheered", { p_limit: limit }));
+  if (!rows.length) return [];
+  const posts = must<Post[]>(await supabase.from("posts").select(POST_FIELDS).in("id", rows.map((r) => r.post_id)));
+  const byId = new Map(posts.map((p) => [p.id, p]));
+  return rows.flatMap((r) => { const p = byId.get(r.post_id); return p ? [{ ...p, cheers: Number(r.n) }] : []; });
 }
 
 export async function getPublished(slug: string) {
   if (!SLUG_RE.test(slug)) return null;
-  return must<Post | null>(await supabase.from("posts").select(POST_FIELDS).eq("slug", slug).eq("status", "published").maybeSingle());
+  const post = must<Post | null>(await supabase.from("posts").select(POST_FIELDS).eq("slug", slug).eq("status", "published").maybeSingle());
+  return post ? (await withCheers([post]))[0] : null;
 }
 
 /** Aynı kategoriden (yoksa en yeni) birkaç yazı. */
-export async function listRelated(post: Post, limit = 3): Promise<Post[]> {
+export async function listRelated(post: Post, limit = 3): Promise<ListedPost[]> {
   let q = supabase.from("posts").select(POST_FIELDS).eq("status", "published").neq("id", post.id).order("published_at", { ascending: false }).limit(limit);
   if (post.category_id) q = q.eq("category_id", post.category_id);
   const same = must<Post[]>(await q);
-  if (same.length || !post.category_id) return same;
+  if (same.length || !post.category_id) return withCheers(same);
   return listPublished({ limit: limit + 1 }).then((all) => all.filter((p) => p.id !== post.id).slice(0, limit));
 }
 

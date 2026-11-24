@@ -4,9 +4,9 @@
 
 ## Neler var
 
-- **Ana sayfa** (`/`): manşet (öne çıkan ya da en yeni yazı), son yazılar, kategori filtresi, "Daha fazla göster".
+- **Ana sayfa** (`/`): manşet (öne çıkan ya da en yeni yazı), "En çok tokuşturulanlar", son yazılar, kategori filtresi, "Daha fazla göster".
 - **Keşfet** (`/kesfet?q=…&kategori=…&etiket=…`): yazı ve yazar araması, kategoriler, etiketler.
-- **Yazı** (`/yazi/:slug`): Markdown metin, paylaş, bildir, sıradaki yazılar.
+- **Yazı** (`/yazi/:slug`): Markdown metin, **tokuştur** (herkes istediği kadar; iki şişe çarpışır), paylaş, bildir, sıradaki yazılar.
 - **Yazarlar** (`/yazarlar`, `/yazar/:id`): yayında yazısı olan üyeler.
 - **Giriş / kayıt / şifre** (`/giris`, `/kayit`, `/sifremi-unuttum`, `/sifre-yenile`): kayıt yazarlar içindir, hesap admin onayını bekler.
 - **Hesabım** (`/hesap`): profil, fotoğraf, şifre, üyelik durumu. Ad 30 günde bir değişir (admin hariç).
@@ -33,6 +33,7 @@ Giriş yapmamış ziyaretçiler yalnızca okur. Yetkiler tarayıcıda değil, Su
 
 - `signup.js`: herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-postayla sınırlı); bot tuzağı ve IP başına saatte 5 deneme sınırı var.
 - `authors.js`: admin onaylı üye hesabı açar.
+- `cheer.js`: tokuşturma; tarayıcı hızlı basışları biriktirip yollar, IP başına saatte 600 sınırı (IP özetlenir).
 - `password.js`: admin bir üyeye yeni geçici şifre üretir (e-posta ulaşmazsa yedek yol).
 - `_supabase.js`: fonksiyonların ortak yardımcıları (fonksiyon olarak yayınlanmaz).
 
@@ -51,7 +52,7 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`, `010_magazine.sql`, `011_profiles_privacy.sql`, `012_signup_limit.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`, `010_magazine.sql`, `011_profiles_privacy.sql`, `012_signup_limit.sql`, `013_cheers.sql`.
 Dosyalar tarih sırasıyla birikmiş değişikliklerdir; son durum: dergi düzeni, yorum ve beğeni yok, yazı için admin onayı.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:

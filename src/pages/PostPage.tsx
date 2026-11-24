@@ -4,9 +4,10 @@ import { useAsync } from "../lib/useAsync";
 import { useTitle } from "../lib/useTitle";
 import { renderMarkdown } from "../lib/markdown";
 import { fmtDate, readingMinutes } from "../lib/format";
-import type { Post } from "../lib/types";
+import type { ListedPost } from "../lib/types";
 import { Avatar } from "../components/Avatar";
 import { ShareButton } from "../components/Actions";
+import { CheersButton } from "../components/Cheers";
 import { ContentNotice, ReportButton } from "../components/Report";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
@@ -23,7 +24,7 @@ export default function PostPage() {
   return <Article post={state.data} />;
 }
 
-function Article({ post }: { post: Post }) {
+function Article({ post }: { post: ListedPost }) {
   const navigate = useNavigate();
   const [related] = useAsync(() => listRelated(post), [post.id]);
   const back = () => (history.length > 1 ? navigate(-1) : navigate("/"));
@@ -55,6 +56,8 @@ function Article({ post }: { post: Post }) {
           </div>
         )}
         <div className="post-actions article-actions">
+          <CheersButton postId={post.id} count={post.cheers} large />
+          <span style={{ flex: 1 }} />
           <ShareButton slug={post.slug} title={post.title} />
           <ReportButton postId={post.id} />
         </div>

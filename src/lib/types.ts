@@ -29,6 +29,9 @@ export type Post = {
   category: Category | null;
 };
 
+/** Okura gösterilen yazı: tokuşturma sayısıyla (supabase/013_cheers.sql). */
+export type ListedPost = Post & { cheers: number };
+
 /** Admin onaylı hesap: yazı paylaşır (supabase/009_members_only.sql). */
 export const canWrite = (role: Role | undefined) => role === "author" || role === "admin";
 

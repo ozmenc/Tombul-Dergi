@@ -60,7 +60,7 @@ export default function Terms() {
         <h2>5. Kişisel veriler</h2>
         <p>
           Kayıtta adını, e-posta adresini ve kayıt tarihini saklarız. Paylaştığın içerikler ve adın sitede herkese
-          görünür. E-posta adresini yalnızca dergi yönetimi görebilir. Verilerin satılmaz. Kanunen zorunlu olduğunda
+          görünür. E-posta adresini yalnızca dergi yönetimi görebilir. Yazılara tokuştururken ya da kayıt olurken kötüye kullanımı sınırlamak için IP adresin geri çevrilemez bir özet olarak en fazla bir gün saklanır. Verilerin satılmaz. Kanunen zorunlu olduğunda
           yetkili makamlarla paylaşılabilir.
         </p>
 
