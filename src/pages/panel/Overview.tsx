@@ -28,7 +28,6 @@ export default function Overview() {
 
   const list = posts.data;
   const published = list.filter((p) => p.status === "published");
-  const sum = (k: "likes" | "dislikes" | "comments") => published.reduce((a, p) => a + p.stats[k], 0);
   const pending = members.status === "success" ? members.data.filter((m) => m.role === "pending") : [];
 
   return (
@@ -44,14 +43,11 @@ export default function Overview() {
       <div className="stats">
         <Stat icon="pen" label="Yayında" value={published.length} to="/panel/yazilar?durum=published" />
         <Stat icon="folder" label="Taslak" value={list.length - published.length} to="/panel/yazilar?durum=draft" />
-        <Stat icon="like" label="Beğeni" value={sum("likes")} />
-        <Stat icon="comment" label="Yorum" value={sum("comments")} />
         {isAdmin && counts.status === "success" && counts.data && (
           <>
             <Stat icon="users" label="Üye" value={counts.data.members} to="/panel/uyeler" />
             <Stat icon="check" label="Onay bekleyen" value={counts.data.pending} to="/panel/uyeler?sekme=onay" />
-            <Stat icon="eyeOff" label="Gizli yorum" value={counts.data.hidden} to="/panel/yorumlar?gizli=1" />
-            <Stat icon="dislike" label="Beğenmeme" value={sum("dislikes")} />
+            <Stat icon="flag" label="Açık bildirim" value={counts.data.reports} to="/panel/bildirimler" />
           </>
         )}
       </div>
@@ -77,7 +73,6 @@ export default function Overview() {
               <li key={p.id}>
                 <Link to={`/panel/yazi/${p.id}`} className="row">
                   <span className="row-main"><strong>{p.title}</strong><small>{fmtRelative(p.updated_at)} güncellendi</small></span>
-                  <span className="row-stats"><Icon name="like" /> {p.stats.likes} <Icon name="comment" /> {p.stats.comments}</span>
                   <span className={`badge ${p.status === "published" ? "badge-mint" : "badge-muted"}`}>{p.status === "published" ? "Yayında" : "Taslak"}</span>
                 </Link>
               </li>

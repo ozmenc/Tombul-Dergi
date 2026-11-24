@@ -7,16 +7,16 @@ const PROFILE_FIELDS = "id,name,bio,avatar_url,role,created_at,name_changed_at";
 export const getProfile = async (id: string) =>
   must<Profile | null>(await supabase.from("profiles").select(PROFILE_FIELDS).eq("id", id).maybeSingle());
 
-export type AuthorCard = Pick<Profile, "id" | "name" | "bio" | "avatar_url" | "role"> & { posts: number; followers: number };
+export type AuthorCard = Pick<Profile, "id" | "name" | "bio" | "avatar_url" | "role"> & { posts: number };
 
-type AuthorRow = Pick<Profile, "id" | "name" | "bio" | "avatar_url" | "role"> & { posts: { count: number }[]; followers: { count: number }[] };
-const AUTHOR_FIELDS = "id,name,bio,avatar_url,role,posts!posts_author_id_fkey(count),followers:follows!follows_followee_id_fkey(count)";
+type AuthorRow = Pick<Profile, "id" | "name" | "bio" | "avatar_url" | "role"> & { posts: { count: number }[] };
+const AUTHOR_FIELDS = "id,name,bio,avatar_url,role,posts!posts_author_id_fkey(count)";
 const toCard = (r: AuthorRow): AuthorCard => ({
   id: r.id, name: r.name, bio: r.bio, avatar_url: r.avatar_url, role: r.role,
-  posts: r.posts[0]?.count ?? 0, followers: r.followers[0]?.count ?? 0,
+  posts: r.posts[0]?.count ?? 0,
 });
 
-/** En az bir yazısı yayında olan üyeler, yazı ve takipçi sayılarıyla. */
+/** En az bir yazısı yayında olan üyeler, yazı sayılarıyla. */
 export async function listAuthors(): Promise<AuthorCard[]> {
   const rows = must<AuthorRow[]>(
     await supabase.from("profiles").select(AUTHOR_FIELDS).in("role", ["author", "admin"]).eq("posts.status", "published").order("created_at")
@@ -72,14 +72,13 @@ export async function signUp(body: { name: string; email: string; password: stri
   if (error) throw new Error("Hesabın açıldı ama giriş yapılamadı. Giriş sayfasından dene.");
 }
 
-/** Admin paneli özeti: üye, başvuru ve yorum sayıları. */
+/** Admin paneli özeti: üye, onay bekleyen ve açık bildirim sayıları. */
 export async function adminCounts() {
   const count = (r: { data: unknown; count: number | null; error: { message: string } | null }) => (must(r), r.count ?? 0);
-  const [members, pending, comments, hidden] = await Promise.all([
+  const [members, pending, reports] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "pending"),
-    supabase.from("comments").select("id", { count: "exact", head: true }),
-    supabase.from("comments").select("id", { count: "exact", head: true }).eq("hidden", true),
+    supabase.from("reports").select("id", { count: "exact", head: true }).eq("resolved", false),
   ]);
-  return { members: count(members), pending: count(pending), comments: count(comments), hidden: count(hidden) };
+  return { members: count(members), pending: count(pending), reports: count(reports) };
 }

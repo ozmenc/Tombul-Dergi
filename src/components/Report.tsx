@@ -1,46 +1,44 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router";
-import { sendReport, type ReportTarget } from "../lib/api/reports";
+import { sendReport } from "../lib/api/reports";
 import { useMe } from "../lib/auth";
 import { Icon } from "./Icon";
 import { useToast } from "./Toast";
 
-/** Kullanıcı içeriğinin altındaki kısa sorumluluk notu. */
-export function ContentNotice({ kind }: { kind: "post" | "comments" }) {
+/** Yazının altındaki kısa sorumluluk notu. */
+export function ContentNotice() {
   return (
     <p className="content-notice">
-      {kind === "post"
-        ? "Bu yazının içeriğinden ve görüşlerinden yalnızca yazarı sorumludur; Tombul Dergi'nin görüşünü yansıtmaz."
-        : "Yorumlardan yalnızca yazanlar sorumludur; Tombul Dergi'nin görüşünü yansıtmaz."}{" "}
+      Bu yazının içeriğinden ve görüşlerinden yalnızca yazarı sorumludur; Tombul Dergi'nin görüşünü yansıtmaz.{" "}
       <Link to="/kosullar">Kullanım koşulları</Link>
     </p>
   );
 }
 
 /** Hukuka aykırı içerik bildirimi: bildirim yalnızca yönetime gider. */
-export function ReportButton({ target, large = false }: { target: ReportTarget; large?: boolean }) {
+export function ReportButton({ postId }: { postId: string }) {
   const me = useMe();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [contact, setContact] = useState("");
   const [busy, setBusy] = useState(false);
-  const id = "postId" in target ? `r-${target.postId}` : `r-${target.commentId}`;
+  const id = `r-${postId}`;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (busy) return;
     if (reason.trim().length < 10) return toast("error", "Neyin sorunlu olduğunu birkaç kelimeyle yaz (en az 10 karakter).");
     setBusy(true);
-    try { await sendReport(target, reason, contact); setOpen(false); setReason(""); setContact(""); toast("success", "Bildirimin yönetime iletildi. Teşekkürler."); }
+    try { await sendReport(postId, reason, contact); setOpen(false); setReason(""); setContact(""); toast("success", "Bildirimin yönetime iletildi. Teşekkürler."); }
     catch { toast("error", "Bildirim gönderilemedi. Tekrar dene."); }
     finally { setBusy(false); }
   }
 
   return (
     <>
-      <button type="button" className={`act ${large ? "act-lg" : ""}`} aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}
-        title="Hukuka aykırı ya da kurallara uymayan içeriği bildir">
+      <button type="button" className="act" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}
+        title="Hukuka aykırı ya da kurallara uymayan yazıyı bildir">
         <Icon name="flag" /> Bildir
       </button>
       {open && (

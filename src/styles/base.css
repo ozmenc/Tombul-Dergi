@@ -29,8 +29,7 @@ a.btn { color: var(--ink); }
 .btn-primary:hover { background: var(--primary-hover); color: var(--on-primary); }
 .btn-amber, a.btn-amber { background: var(--amber); color: #15183a; }
 .btn-amber:hover { background: var(--amber); color: #15183a; filter: brightness(1.05); }
-.btn-ink, a.btn-ink { background: var(--ink); color: var(--bg); }
-.btn-ink:hover { background: var(--ink); color: var(--bg); opacity: 0.9; }
+
 .btn-ghost { background: transparent; }
 .btn-danger { background: var(--danger-soft); color: var(--danger); }
 .btn-danger:hover { background: var(--danger); color: #fff; }
@@ -72,9 +71,8 @@ a.chip { color: var(--ink); }
 .badge-amber { background: var(--amber-soft); color: var(--amber-ink); }
 .badge-blue { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
 .badge-mint { background: var(--mint-soft); color: var(--mint); }
-.badge-pink { background: var(--pink-soft); color: var(--pink); }
+
 .badge-muted { background: var(--surface-2); color: var(--muted); }
-.badge-ink { background: var(--ink); color: var(--bg); }
 
 .segmented { display: inline-flex; gap: 4px; padding: 5px; background: var(--surface); border-radius: var(--r-field); box-shadow: var(--shadow); flex-wrap: wrap; }
 .segmented button, .segmented a { min-height: 38px; padding: 0 16px; border: 0; border-radius: var(--r-field); background: none; color: var(--ink); font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }

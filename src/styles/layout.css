@@ -1,4 +1,4 @@
-/* Uygulama iskeleti: solda menü, ortada akış, sağda keşif; telefonda üst çubuk + alt sekmeler. */
+/* Uygulama iskeleti: solda menü, ortada yazılar, sağda keşif; telefonda üst çubuk + alt sekmeler. */
 .shell { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 248px minmax(0, 660px) 320px; gap: 28px; padding: 20px var(--gutter) 40px; justify-content: center; align-items: start; }
 .shell.wide { grid-template-columns: 248px minmax(0, 1000px); }
 .shell main { min-width: 0; display: flex; flex-direction: column; gap: 20px; }

@@ -10,29 +10,29 @@ export default function Terms() {
       <div className="prose">
         <h2>1. Tombul Dergi nedir?</h2>
         <p>
-          Tombul Dergi, üyelerin kendi yazılarını ve yorumlarını paylaştığı bir platformdur. Tombul Dergi, 5651 sayılı Kanun
+          Tombul Dergi, yönetimin onayladığı üyelerin kendi yazılarını yayınladığı bir çevrimiçi dergidir. Tombul Dergi, 5651 sayılı Kanun
           kapsamında <strong>yer sağlayıcıdır</strong>. Üyelerin paylaştığı içerikleri önceden kontrol etmekle ya da hukuka
           aykırı bir faaliyet olup olmadığını araştırmakla yükümlü değildir.
         </p>
 
         <h2>2. İçerikten kim sorumlu?</h2>
         <p>
-          Sitedeki yazılar, yorumlar, görseller ve diğer bütün içerikler <strong>onları paylaşan üyelere aittir</strong>.
+          Sitedeki yazılar, görseller ve diğer bütün içerikler <strong>onları paylaşan üyelere aittir</strong>.
           Bu içeriklerden doğan her türlü hukuki ve cezai sorumluluk <strong>yalnızca içeriği paylaşan üyeye</strong> aittir.
         </p>
         <p>
           Tombul Dergi, yöneticileri ve geliştiricileri, üyelerin paylaştığı içeriklerin doğruluğu, güncelliği, hukuka
           uygunluğu ya da üçüncü kişilerin haklarını ihlal edip etmediği konusunda <strong>hiçbir sorumluluk kabul etmez</strong>.
-          Yazılar ve yorumlar yazarlarının görüşüdür. Tombul Dergi'nin görüşünü yansıtmaz.
+          Yazılar yazarlarının görüşüdür. Tombul Dergi'nin görüşünü yansıtmaz.
         </p>
 
         <p>
-          Yazı, yorum, beğeni ve diğer etkileşimler yalnızca <strong>yönetimin onayladığı hesaplardan</strong> yapılabilir; diğer ziyaretçiler yalnızca okuyabilir. Onay, içeriğin
+          Yazı yalnızca <strong>yönetimin onayladığı hesaplardan</strong> yayınlanabilir; diğer ziyaretçiler yalnızca okuyabilir. Onay, içeriğin
           yönetimce incelendiği ya da benimsendiği anlamına gelmez; sorumluluk yine paylaşan üyededir.
         </p>
 
         <h2>3. Üye olarak neyi kabul ediyorsun?</h2>
-        <p>Kayıt olarak, yazı yayınlayarak ya da yorum göndererek şunları kabul edersin:</p>
+        <p>Kayıt olarak ya da yazı yayınlayarak şunları kabul edersin:</p>
         <ul>
           <li>Paylaştığın her içerikten hukuken yalnızca sen sorumlusun.</li>
           <li>
@@ -48,7 +48,7 @@ export default function Terms() {
 
         <h2>4. Bildirim ve içerik kaldırma</h2>
         <p>
-          Hukuka aykırı ya da bu kurallara uymayan bir içerik görürsen, yazının ya da yorumun altındaki{" "}
+          Hukuka aykırı ya da bu kurallara uymayan bir içerik görürsen, yazının altındaki{" "}
           <strong>Bildir</strong> düğmesiyle yönetime bildir. Bildirimler incelenir. Hukuka aykırı bulunan içerik
           yayından kaldırılır.
         </p>

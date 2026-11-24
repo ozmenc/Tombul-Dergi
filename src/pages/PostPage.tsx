@@ -1,14 +1,12 @@
-import { useCallback, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { getPublished, listRelated } from "../lib/api/posts";
 import { useAsync } from "../lib/useAsync";
 import { useTitle } from "../lib/useTitle";
 import { renderMarkdown } from "../lib/markdown";
 import { fmtDate, readingMinutes } from "../lib/format";
-import type { FeedPost } from "../lib/types";
+import type { Post } from "../lib/types";
 import { Avatar } from "../components/Avatar";
-import { FollowButton, SaveButton, ShareButton, VoteButtons } from "../components/Actions";
-import { Comments } from "../components/Comments";
+import { ShareButton } from "../components/Actions";
 import { ContentNotice, ReportButton } from "../components/Report";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
@@ -25,10 +23,8 @@ export default function PostPage() {
   return <Article post={state.data} />;
 }
 
-function Article({ post }: { post: FeedPost }) {
+function Article({ post }: { post: Post }) {
   const navigate = useNavigate();
-  const [comments, setComments] = useState(post.stats.comments);
-  const onCount = useCallback((n: number) => setComments(n), []);
   const [related] = useAsync(() => listRelated(post), [post.id]);
   const back = () => (history.length > 1 ? navigate(-1) : navigate("/"));
 
@@ -44,12 +40,11 @@ function Article({ post }: { post: FeedPost }) {
         {post.excerpt && <p className="article-lede">{post.excerpt}</p>}
         {post.author && (
           <div className="post-head">
-            <Link to={`/yazar/${post.author.id}`} tabIndex={-1} aria-hidden="true"><Avatar person={post.author} size={48} ring /></Link>
+            <Link to={`/yazar/${post.author.id}`} tabIndex={-1} aria-hidden="true"><Avatar person={post.author} size={48} /></Link>
             <div className="who">
               <Link to={`/yazar/${post.author.id}`}>{post.author.name || "İsimsiz yazar"}</Link>
               <small>{fmtDate(post.published_at)} · {readingMinutes(post.content)} dk okuma</small>
             </div>
-            <FollowButton authorId={post.author.id} small />
           </div>
         )}
         {post.cover && <img className="article-cover" src={post.cover} alt="" />}
@@ -60,22 +55,16 @@ function Article({ post }: { post: FeedPost }) {
           </div>
         )}
         <div className="post-actions article-actions">
-          <VoteButtons kind="post" id={post.id} likes={post.stats.likes} dislikes={post.stats.dislikes} myVote={post.myVote} large />
-          <a href="#yorumlar" className="act act-lg"><Icon name="comment" /><span>{comments} yorum</span></a>
-          <span className="spacer" />
-          <SaveButton postId={post.id} large />
-          <ShareButton slug={post.slug} title={post.title} large />
-          <ReportButton target={{ postId: post.id }} large />
+          <ShareButton slug={post.slug} title={post.title} />
+          <ReportButton postId={post.id} />
         </div>
-        <ContentNotice kind="post" />
+        <ContentNotice />
       </article>
-
-      <Comments postId={post.id} postAuthorId={post.author_id} onCountChange={onCount} />
 
       {related.status === "success" && related.data.length > 0 && (
         <section aria-labelledby="siradaki" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <h2 id="siradaki" style={{ fontSize: 24 }}>Sıradaki yazılar</h2>
-          {related.data.map((p) => <PostCard key={p.id} post={p} showFollow={false} />)}
+          {related.data.map((p) => <PostCard key={p.id} post={p} />)}
         </section>
       )}
     </>

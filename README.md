@@ -4,18 +4,18 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 
 ## Neler var
 
-- **Akış** (`/`): yazar halkaları, "Senin için / Takip ettiklerin / Popüler", kategori filtresi, "Daha fazla göster". Popüler sıralaması sunucuda (`popular_post_ids`).
+- **Ana sayfa** (`/`): manşet (öne çıkan ya da en yeni yazı), son yazılar, kategori filtresi, "Daha fazla göster".
 - **Keşfet** (`/kesfet?q=…&kategori=…&etiket=…`): yazı ve yazar araması, kategoriler, etiketler.
-- **Yazı** (`/yazi/:slug`): Markdown metin, beğen / beğenme, kaydet, paylaş, yorumlar ve yanıtlar, sıradaki yazılar.
-- **Yazarlar** (`/yazarlar`, `/yazar/:id`): takip et, takipçi ve yazı sayıları.
-- **Kaydettiklerim** (`/kaydedilenler`), **Hesabım** (`/hesap`): profil, fotoğraf, şifre, üyelik durumu. Ad 30 günde bir değişir (admin hariç).
-- **Giriş / kayıt** (`/giris`, `/kayit`): yeni hesap admin onayını bekler.
-- **Şifremi unuttum** (`/sifremi-unuttum` → e-posta → `/sifre-yenile`).
-- **Panel** (`/panel`, yazar ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak, resim boyutu: `![](url "küçük")` / `"orta"`, öne çıkarma yalnızca admin).
-  Admin ayrıca kategorileri, üyeleri (e-postalar, hesap onayı, roller, onaylı üye ekleme, şifre sıfırlama) ve yorumları (gizle / sil) yönetir.
+- **Yazı** (`/yazi/:slug`): Markdown metin, paylaş, bildir, sıradaki yazılar.
+- **Yazarlar** (`/yazarlar`, `/yazar/:id`): yayında yazısı olan üyeler.
+- **Giriş / kayıt / şifre** (`/giris`, `/kayit`, `/sifremi-unuttum`, `/sifre-yenile`): kayıt yazarlar içindir, hesap admin onayını bekler.
+- **Hesabım** (`/hesap`): profil, fotoğraf, şifre, üyelik durumu. Ad 30 günde bir değişir (admin hariç).
+- **Panel** (`/panel`, onaylı üye ve admin): genel bakış, yazılar, editör (kategori, etiket, özet, kapak,
+  resim boyutu: `![](url "küçük")` / `"orta"`). Öne çıkarma yalnızca admin.
+  Admin ayrıca kategorileri, üyeleri (e-postalar, hesap onayı, roller, onaylı üye ekleme, şifre sıfırlama) ve bildirimleri yönetir.
 - **Hukuki koruma**: `/kosullar` (kullanım koşulları ve sorumluluk reddi, 5651 yer sağlayıcı); kayıtta zorunlu onay
-  (sürüm ve tarih hesabın `user_metadata`sına yazılır); yazı altında, yorum kutusunda, editörde ve kenar çubuğunda sorumluluk notu;
-  yazı ve yorumlarda **Bildir** (herkes gönderir, yalnızca admin görür: Panel → Moderasyon).
+  (sürüm ve tarih hesabın `user_metadata`sına yazılır); yazı altında ve editörde sorumluluk notu;
+  yazılarda **Bildir** (herkes gönderir, yalnızca admin görür: Panel → Bildirimler).
 - Aydınlık ve koyu tema; her sayfada yükleniyor, boş, hata ve 404 durumları.
 - Maskot: `src/components/Bottle.tsx` (gözleri imleci izler; sevinç, üzgün, utangaç, dolum, devrik halleri).
 
@@ -24,7 +24,7 @@ Oku, beğen, yorum yap, sen de yaz. Vite + React + TypeScript, Supabase (veritab
 | Rol | Yapabilir |
 |---|---|
 | `pending` (onay bekliyor) | yalnızca okur; yeni kayıtlar böyle açılır |
-| `author` (onaylı üye) | yazı paylaşır, beğenir, kaydeder, takip eder |
+| `author` (onaylı üye) | yazı paylaşır |
 | `admin` | her şey; hesapları onaylar (Panel → Üyeler) |
 
 Giriş yapmamış ziyaretçiler yalnızca okur. Yetkiler tarayıcıda değil, Supabase RLS kurallarında (`supabase/*.sql`).
@@ -51,7 +51,8 @@ npm run logo                 # public/logo.svg ve favicon'u src/brand/logo.ts'te
 
 ## Veritabanı
 
-Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`.
+Boş bir Supabase projesine sırayla bir kez uygulanır: `supabase/schema.sql`, `002_social.sql`, `003_stats.sql`, `004_popular.sql`, `005_members.sql`, `006_comment_dedupe.sql`, `007_reports.sql`, `008_approval.sql`, `009_members_only.sql`, `010_magazine.sql`.
+Dosyalar tarih sırasıyla birikmiş değişikliklerdir; son durum: dergi düzeni, yorum ve beğeni yok, yazı için admin onayı.
 
 Şifre sıfırlama e-postası için Supabase → Authentication → URL Configuration:
 **Site URL** canlı adres olmalı, **Redirect URLs** listesinde `https://<canlı adres>/sifre-yenile` bulunmalı.

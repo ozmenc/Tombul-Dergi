@@ -20,7 +20,7 @@ const TABS = [["onay", "Onay bekleyenler"], ["hepsi", "Tüm üyeler"]] as const;
 type Tab = (typeof TABS)[number][0];
 
 const EMPTY: Record<Tab, [string, string]> = {
-  onay: ["Onay bekleyen hesap yok", "Yeni kayıtlar burada görünür. Onayladığın hesaplar yazı ve yorum paylaşabilir."],
+  onay: ["Onay bekleyen hesap yok", "Yeni kayıtlar burada görünür. Onayladığın hesaplar yazı paylaşabilir."],
   hepsi: ["Eşleşen üye yok", "Başka bir isim dene."],
 };
 
@@ -84,7 +84,7 @@ function MemberManager() {
                   <span className="row-main"><strong>{m.name || "İsimsiz"}{m.id === me.id && " (sen)"} {!canWrite(m.role) && <span className="badge badge-amber">onay bekliyor</span>}</strong><small>{m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}{m.email && " · "}{fmtRelative(m.created_at)} katıldı</small></span>
                   {m.role === "pending" ? (
                     <button type="button" className="btn btn-sm btn-primary" disabled={busyId === m.id}
-                      onClick={() => change(m, "author", `${m.name || "Üye"} onaylandı; artık yazı ve yorum paylaşabilir.`)}><Icon name="check" /> Hesabı onayla</button>
+                      onClick={() => change(m, "author", `${m.name || "Üye"} onaylandı; artık yazı paylaşabilir.`)}><Icon name="check" /> Hesabı onayla</button>
                   ) : (
                     <>
                       <label className="sr-only" htmlFor={`role-${m.id}`}>{m.name} rolü</label>
@@ -173,7 +173,7 @@ function AddAuthor({ onAdded }: { onAdded: () => void }) {
   return (
     <form className="card panel-section" onSubmit={submit} noValidate>
       <PanelHead title="Onaylı üye ekle" />
-      <p className="muted" style={{ marginBottom: 16 }}>Hesap onaylı açılır: hemen yazı ve yorum paylaşabilir. Geçici şifreyi sen ilet; Hesabım sayfasından değiştirebilir. Kullanım koşullarını da ilet: paylaştığı içerikten yalnızca kendisi sorumludur.</p>
+      <p className="muted" style={{ marginBottom: 16 }}>Hesap onaylı açılır: hemen yazı paylaşabilir. Geçici şifreyi sen ilet; Hesabım sayfasından değiştirebilir. Kullanım koşullarını da ilet: paylaştığı içerikten yalnızca kendisi sorumludur.</p>
       <div className="grid-2">
         <label className="field"><span>Ad</span><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={80} /></label>
         <label className="field"><span>E-posta</span><input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></label>

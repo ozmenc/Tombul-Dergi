@@ -8,7 +8,6 @@ import { usePaged } from "../lib/usePaged";
 import { useTitle } from "../lib/useTitle";
 import { sanitizeSearch } from "../lib/format";
 import { Avatar } from "../components/Avatar";
-import { FollowButton } from "../components/Actions";
 import { Icon } from "../components/Icon";
 import { PostCard } from "../components/PostCard";
 import { EmptyState, ErrorState, FeedSkeleton, LoadMore } from "../components/States";
@@ -91,10 +90,9 @@ export default function Explore() {
           {people.data.map((a) => (
             <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <Link to={`/yazar/${a.id}`} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, color: "var(--ink)" }}>
-                <Avatar person={a} size={44} ring />
-                <span><strong>{a.name}</strong><br /><small className="muted">{a.posts} yazı · {a.followers} takipçi</small></span>
+                <Avatar person={a} size={44} />
+                <span><strong>{a.name}</strong><br /><small className="muted">{a.posts} yazı</small></span>
               </Link>
-              <FollowButton authorId={a.id} small />
             </div>
           ))}
         </section>

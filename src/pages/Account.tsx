@@ -66,11 +66,11 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
   return (
     <>
       <header className="profile-head card">
-        <Avatar person={{ id: me.id, name: profile.name || me.name, avatar_url: profile.avatar_url }} size={96} ring />
+        <Avatar person={{ id: me.id, name: profile.name || me.name, avatar_url: profile.avatar_url }} size={96} />
         <div className="profile-text">
           <span className={`badge ${canWrite(me.role) ? "badge-blue" : "badge-amber"}`}>{ROLE_LABEL[me.role]}</span>
           <h1>{me.name || "Hesabım"}</h1>
-          <p className="muted">{canWrite(me.role) ? "Adın, fotoğrafın ve kısa tanıtımın yorumlarında ve yazılarında görünür." : "Hesabın yönetim onayı bekliyor. Onaylanınca yorum yazabilirsin."}</p>
+          <p className="muted">{canWrite(me.role) ? "Adın, fotoğrafın ve kısa tanıtımın yazılarında ve yazar sayfanda görünür." : "Hesabın yönetim onayı bekliyor. Onaylanınca yazı paylaşabilirsin."}</p>
         </div>
         <button type="button" className="btn" onClick={() => signOut()}><Icon name="logout" /> Çıkış yap</button>
       </header>
@@ -99,7 +99,7 @@ function AccountForms({ me, refresh }: { me: Profile; refresh: () => Promise<voi
 
       <MemberStatus me={me} />
       <PasswordForm />
-      <p className="content-notice">Paylaştığın yazı ve yorumlardan hukuken yalnızca sen sorumlusun. <Link to="/kosullar">Kullanım koşulları</Link></p>
+      <p className="content-notice">Paylaştığın yazılardan hukuken yalnızca sen sorumlusun. <Link to="/kosullar">Kullanım koşulları</Link></p>
     </>
   );
 }
@@ -113,8 +113,8 @@ function MemberStatus({ me }: { me: Profile }) {
       <div style={{ flex: 1 }}>
         <h2>Üyelik</h2>
         <p className="muted">{approved
-          ? "Hesabın onaylı. Yazı paylaşabilir, yorum yazabilir, beğenebilir ve takip edebilirsin."
-          : "Hesabın yönetim onayı bekliyor. Onaylanınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin; o zamana kadar yazıları okuyabilirsin."}</p>
+          ? "Hesabın onaylı. Panelden yazı yazıp yayınlayabilirsin."
+          : "Hesabın yönetim onayı bekliyor. Onaylanınca yazı paylaşabilirsin; o zamana kadar yazıları okuyabilirsin."}</p>
       </div>
       {approved && <Link className="btn btn-primary" to="/panel/yeni"><Icon name="pen" /> Yeni yazı</Link>}
     </section>

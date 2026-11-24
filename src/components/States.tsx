@@ -72,7 +72,7 @@ export function NotFound({ title = "Bu sayfa devrilmiş", children }: { title?: 
       <p className="badge badge-amber">404</p>
       <h1>{title}</h1>
       <p>{children ?? "Aradığın sayfa taşınmış, silinmiş ya da hiç var olmamış olabilir."}</p>
-      <Link className="btn btn-primary" to="/">Akışa dön</Link>
+      <Link className="btn btn-primary" to="/">Ana sayfaya dön</Link>
     </section>
   );
 }
@@ -84,7 +84,7 @@ export function Forbidden({ children }: { children?: ReactNode }) {
       <Bottle mood="shy" size={80} track={false} />
       <h1>Bu sayfa sana kapalı</h1>
       <p>{children ?? "Burayı görmek için gereken yetkin yok."}</p>
-      <Link className="btn" to="/">Akışa dön</Link>
+      <Link className="btn" to="/">Ana sayfaya dön</Link>
     </section>
   );
 }

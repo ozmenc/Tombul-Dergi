@@ -1,5 +1,5 @@
 // Herkese açık kayıt. E-posta doğrulaması yok (Supabase'in hazır e-posta servisi saatte birkaç e-posta ile sınırlı);
-// yeni hesap "onay bekliyor" olarak açılır (yalnızca okur); admin onaylayınca yazı, yorum ve beğeni açılır.
+// yeni hesap "onay bekliyor" olarak açılır (yalnızca okur); admin onaylayınca yazı paylaşabilir.
 import { createAccount, validateAccount } from "./_supabase.js";
 
 export default async function handler(req, res) {

@@ -11,7 +11,7 @@ import { Icon } from "./Icon";
 
 export function Brand({ size = 26 }: { size?: number }) {
   return (
-    <Link to="/" className="brand" aria-label="Tombul Dergi, akışa dön">
+    <Link to="/" className="brand" aria-label="Tombul Dergi, ana sayfa">
       <Bottle size={size} />
       <span aria-hidden="true">Tombul Dergi</span>
     </Link>
@@ -38,10 +38,9 @@ function Rail() {
     <aside className="rail" aria-label="Ana menü">
       <Brand />
       <nav aria-label="Ana gezinme" style={{ display: "contents" }}>
-        <NavLink to="/" end className="rail-link"><Icon name="home" />Akış</NavLink>
+        <NavLink to="/" end className="rail-link"><Icon name="home" />Ana sayfa</NavLink>
         <NavLink to="/kesfet" className="rail-link"><Icon name="search" />Keşfet</NavLink>
         <NavLink to="/yazarlar" className="rail-link"><Icon name="users" />Yazarlar</NavLink>
-        <NavLink to="/kaydedilenler" className="rail-link"><Icon name="bookmark" />Kaydettiklerim</NavLink>
         {me && canWrite(me.role) && <NavLink to="/panel" className="rail-link"><Icon name="grid" />Panel</NavLink>}
       </nav>
       <Link to={writeTarget(me)} className="btn btn-primary btn-lg rail-write"><Icon name="pen" />Yaz</Link>
@@ -80,10 +79,10 @@ function TabBar() {
   const me = useMe();
   return (
     <nav className="tabbar" aria-label="Alt gezinme">
-      <NavLink to="/" end><Icon name="home" />Akış</NavLink>
+      <NavLink to="/" end><Icon name="home" />Ana sayfa</NavLink>
       <NavLink to="/kesfet"><Icon name="search" />Keşfet</NavLink>
       <NavLink to={writeTarget(me)} className="tab-write" aria-label="Yaz"><Icon name="plus" /></NavLink>
-      <NavLink to="/kaydedilenler"><Icon name="bookmark" />Kaydet</NavLink>
+      <NavLink to="/yazarlar"><Icon name="users" />Yazarlar</NavLink>
       {me ? <NavLink to={canWrite(me.role) ? "/panel" : "/hesap"}><Icon name={canWrite(me.role) ? "grid" : "user"} />{canWrite(me.role) ? "Panel" : "Hesap"}</NavLink>
         : <NavLink to="/giris"><Icon name="user" />Giriş</NavLink>}
     </nav>
@@ -114,17 +113,17 @@ function Aside() {
       {!me && (
         <section className="aside-box aside-cta">
           <h2>Sen de yaz.</h2>
-          <p>Kayıt ol; yönetim hesabını onaylayınca yazı paylaşır, yorum yapar, beğenirsin.</p>
+          <p>Yazar olarak kayıt ol; yönetim hesabını onaylayınca yazıların dergide yayınlanır.</p>
           <Link to="/kayit" className="btn btn-amber">Kayıt ol</Link>
         </section>
       )}
       {me?.role === "pending" && (
         <section className="aside-box aside-cta">
           <h2>Onay bekleniyor</h2>
-          <p>Hesabın yönetim onayında. Onaylanınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin.</p>
+          <p>Hesabın yönetim onayında. Onaylanınca yazı paylaşabilirsin.</p>
         </section>
       )}
-      <p className="content-notice">Yazı ve yorumlardan yalnızca yazanlar sorumludur. <Link to="/kosullar">Kullanım koşulları</Link></p>
+      <p className="content-notice">Yazılardan yalnızca yazarları sorumludur. <Link to="/kosullar">Kullanım koşulları</Link></p>
     </aside>
   );
 }

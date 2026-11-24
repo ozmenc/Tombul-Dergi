@@ -58,7 +58,6 @@ export default function Posts() {
                       <strong>{p.featured && <Icon name="star" className="icon inline-star" filled />}{p.title}</strong>
                       <small>{me.role === "admin" && p.author ? `${p.author.name} · ` : ""}{p.category?.name ?? "Kategorisiz"} · {fmtRelative(p.updated_at)} güncellendi</small>
                     </span>
-                    <span className="row-stats"><Icon name="like" /> {p.stats.likes} <Icon name="dislike" /> {p.stats.dislikes} <Icon name="comment" /> {p.stats.comments}</span>
                     <span className={`badge ${p.status === "published" ? "badge-mint" : "badge-muted"}`}>{p.status === "published" ? "Yayında" : "Taslak"}</span>
                   </Link>
                 </li>

@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, isRouteErrorResponse, Link, RouterProvider, useRouteError } from "react-router";
 import "./styles/index.css";
 import { AuthProvider } from "./lib/auth";
-import { SocialProvider } from "./lib/social";
 import { ThemeProvider } from "./lib/theme";
 import { ToastProvider } from "./components/Toast";
 import { Shell } from "./components/Shell";
@@ -14,7 +13,6 @@ import Explore from "./pages/Explore";
 import PostPage from "./pages/PostPage";
 import Authors from "./pages/Authors";
 import AuthorPage from "./pages/AuthorPage";
-import Saved from "./pages/Saved";
 import Account from "./pages/Account";
 import { ForgotPassword, Login, ResetPassword, Signup } from "./pages/AuthPages";
 
@@ -33,7 +31,7 @@ function Crash() {
         <p>Sayfa açılırken beklenmeyen bir hata oldu. Yenilemek çoğu zaman düzeltir.</p>
         <div style={{ display: "flex", gap: 10 }}>
           <button className="btn btn-primary" onClick={() => location.reload()}>Sayfayı yenile</button>
-          <Link className="btn" to="/">Akışa dön</Link>
+          <Link className="btn" to="/">Ana sayfaya dön</Link>
         </div>
       </section>
     </div>
@@ -54,7 +52,6 @@ const router = createBrowserRouter([
       { path: "/yazi/:slug", element: <PostPage /> },
       { path: "/yazarlar", element: <Authors /> },
       { path: "/yazar/:id", element: <AuthorPage /> },
-      { path: "/kaydedilenler", element: <Saved /> },
       { path: "/kosullar", lazy: lazy(() => import("./pages/Terms")) },
       { path: "/hesap", element: <Account /> },
       { path: "*", element: <NotFound /> },
@@ -75,7 +72,7 @@ const router = createBrowserRouter([
           { path: "yazi/:id", lazy: lazy(() => import("./pages/panel/Editor")) },
           { path: "kategoriler", lazy: lazy(() => import("./pages/panel/Categories")) },
           { path: "uyeler", lazy: lazy(() => import("./pages/panel/Members")) },
-          { path: "yorumlar", lazy: lazy(() => import("./pages/panel/Moderation")) },
+          { path: "bildirimler", lazy: lazy(() => import("./pages/panel/Reports")) },
         ],
       },
     ],
@@ -86,11 +83,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <SocialProvider>
-          <ToastProvider>
-            <RouterProvider router={router} />
-          </ToastProvider>
-        </SocialProvider>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>

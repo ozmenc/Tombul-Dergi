@@ -74,7 +74,7 @@ export function Login() {
   }
 
   return (
-    <AuthLayout shy={shy} title="Tekrar hoş geldin" lede="Okumaya, beğenmeye ve yorum yapmaya kaldığın yerden devam et.">
+    <AuthLayout shy={shy} title="Tekrar hoş geldin" lede="Yazılarına kaldığın yerden devam et.">
       <form onSubmit={submit} noValidate>
         <label className="field"><span>E-posta</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required /></label>
         <PasswordField value={password} onChange={setPassword} onFocus={() => setShy(true)} onBlur={() => setShy(false)} autoComplete="current-password" />
@@ -112,7 +112,7 @@ export function Signup() {
     setBusy(true);
     try {
       await signUp(form);
-      toast("success", "Hoş geldin! Hesabın yönetim onayını bekliyor; onaylanınca yazı ve yorum paylaşabilirsin.");
+      toast("success", "Hoş geldin! Hesabın yönetim onayını bekliyor; onaylanınca yazı paylaşabilirsin.");
       navigate(next, { replace: true });
     } catch (err) {
       setError((err as Error).message);
@@ -122,7 +122,7 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout shy={shy} title="Aramıza katıl" lede="Yönetim hesabını onaylayınca yazı paylaşabilir, yorum yazabilir ve beğenebilirsin.">
+    <AuthLayout shy={shy} title="Yazar olarak katıl" lede="Okumak için hesap gerekmez. Kayıt ol; yönetim hesabını onaylayınca yazıların dergide yayınlanır.">
       <form onSubmit={submit} noValidate>
         <label className="field"><span>Adın</span><input value={form.name} onChange={(e) => set("name", e.target.value)} autoComplete="name" maxLength={80} required /></label>
         <label className="field"><span>E-posta</span><input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" required /></label>
@@ -133,7 +133,7 @@ export function Signup() {
         <label className="check" style={{ marginBottom: 18 }}>
           <input type="checkbox" checked={form.acceptedTerms} onChange={(e) => set("acceptedTerms", e.target.checked)} required />
           <span><strong><Link to="/kosullar" target="_blank">Kullanım koşullarını</Link> okudum ve kabul ediyorum</strong>
-            <span>Paylaştığım yazı ve yorumlardan hukuken yalnızca ben sorumluyum; Tombul Dergi sorumluluk kabul etmez.</span></span>
+            <span>Paylaştığım yazılardan hukuken yalnızca ben sorumluyum; Tombul Dergi sorumluluk kabul etmez.</span></span>
         </label>
         {error && <p className="form-error" role="alert">{error}</p>}
         <button className="btn btn-primary btn-lg btn-block" disabled={busy}>{busy ? "Hesabın açılıyor…" : "Kayıt ol"}</button>

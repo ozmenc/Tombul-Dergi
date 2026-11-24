@@ -12,12 +12,6 @@ export function must<T = unknown>(r: { data: unknown; error: PgError | null }): 
 
 export const errorCode = (e: unknown) => (e as { code?: string } | null)?.code;
 
-/** Şu anki oturumun kullanıcı kimliği (yoksa null). */
-export async function currentUserId() {
-  const { data } = await supabase.auth.getSession();
-  return data.session?.user.id ?? null;
-}
-
 /** Vercel fonksiyonuna JSON POST; sunucunun hata metnini Error olarak fırlatır. */
 export async function postJson(path: string, body: unknown, auth = false) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };

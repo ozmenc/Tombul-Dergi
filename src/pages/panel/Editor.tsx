@@ -207,7 +207,7 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
 
         <label className="field">
           <span>Kısa özet</span>
-          <textarea rows={3} value={v.excerpt} maxLength={300} onChange={(e) => set("excerpt", e.target.value)} placeholder="Akışta başlığın altında görünür. Boş bırakırsan metnin başı kullanılır." />
+          <textarea rows={3} value={v.excerpt} maxLength={300} onChange={(e) => set("excerpt", e.target.value)} placeholder="Listelerde başlığın altında görünür. Boş bırakırsan metnin başı kullanılır." />
           <small className="help">{300 - v.excerpt.length} karakter kaldı</small>
         </label>
 
@@ -234,7 +234,7 @@ function Form({ initial, categories }: { initial: Post | null; categories: Categ
         {isAdmin && (
           <label className="check">
             <input type="checkbox" checked={v.featured} onChange={(e) => set("featured", e.target.checked)} />
-            <span><strong>Öne çıkar</strong><span>Akışta en üstte, yıldızla görünür.</span></span>
+            <span><strong>Öne çıkar</strong><span>Ana sayfada manşette görünür.</span></span>
           </label>
         )}
 
