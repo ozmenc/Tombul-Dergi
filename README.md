@@ -1,26 +1,34 @@
 # Tombul Dergi
 
-Düz HTML/CSS/JS, derleme gerektirmez.
+Çok yazarlı küçük bir dergi. Vite + React + TypeScript, three.js karakterler, Supabase (veritabanı, giriş, resimler), Vercel.
 
-## Dosyalar
-- `index.html`  → site (tasarım ve görünüm)
-- `posts.js`    → TÜM YAZILAR burada
-- `images/`     → resimler (yüklediklerin buraya)
+## Nasıl çalışır
 
-## Yazı eklemek
-`posts.js` dosyasını aç, listenin en üstüne yeni bir `{ ... }` bloğu ekle.
+- **Site** (`/`, `/yazi/:slug`, `/yazarlar`, `/yazar/:id`): yayındaki yazıları herkes okur.
+- **Panel** (`/panel`): yazarlar e-posta ve şifreyle girer.
+  - **Yazar** kendi yazılarını yazar, düzenler, yayınlar ve siler.
+  - **Admin** tüm yazıları yönetir, yeni yazar ekler, rolleri değiştirir.
+  - "Durduruldu" (`pending`) hesap giriş yapabilir ama yazamaz.
+- Yetkiler tarayıcıda değil, Supabase'in RLS kurallarında: `supabase/schema.sql`.
+- Yazar hesabı açmak servis anahtarı gerektirdiği için `api/authors.js` (Vercel fonksiyonu) üzerinden yapılır.
+- Yazılar Markdown: `**kalın**`, `*eğik*`, `## başlık`, `> alıntı`, `[bağlantı](https://…)`, resimler panelden yüklenir.
 
-## Resim eklemek
-- Dosyayı `images/` klasörüne koy.
-- Kapak: `cover: "images/dosya.jpg"`
-- Yazı içi: boş satıra `![açıklama](images/dosya.jpg)`
+## Geliştirme
 
-## Arka plan fotoğrafı
-Flu sokak fotoğrafını `images/arka-plan.jpg` adıyla koy, otomatik kullanılır.
-Yoksa yerine çizilmiş flu bir sokak sahnesi görünür.
+```bash
+npm install
+vercel env pull .env.local   # Supabase değişkenleri
+npm run dev                  # arayüz (http://localhost:5173)
+npm test                     # birim testleri
+npm run build                # tip kontrolü + derleme
+```
 
-## Vercel'e yayınlamak
-1. Klasörü GitHub'a yükle.
-2. vercel.com → Add New → Project → repoyu seç → Deploy.
-   (Framework: "Other", build komutu boş.)
-Sonraki her güncellemede GitHub'a gönder, Vercel kendiliğinden yeniler.
+`npm run dev` sadece arayüzü çalıştırır; panelde "Yazar ekle" `/api/authors` fonksiyonuna ihtiyaç duyar ve Vercel'de çalışır.
+
+## Yayın
+
+`main` dalına her push Vercel'de otomatik yayınlanır.
+
+## Veritabanı
+
+Şema `supabase/schema.sql` dosyasında; boş bir Supabase projesine bir kez uygulanır.
