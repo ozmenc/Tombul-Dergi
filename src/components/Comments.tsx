@@ -35,7 +35,7 @@ export function Comments({ postId, postAuthorId, onCountChange }: { postId: stri
 
   const update = (fn: (l: Comment[]) => Comment[]) => setState((s) => (s.status === "success" ? { status: "success", data: fn(s.data) } : s));
   // Ekranda hemen göster, sonra sunucudan sessizce tazele (yolda kalmış eski bir yükleme listeyi ezmesin).
-  const added = (c: Comment) => { update((l) => [...l, c]); setFresh(c.id); setReplyTo(null); refresh(); };
+  const added = (c: Comment) => { update((l) => (l.some((x) => x.id === c.id) ? l : [...l, c])); setFresh(c.id); setReplyTo(null); refresh(); };
   const removed = (id: string) => update((l) => l.filter((c) => c.id !== id && c.parent_id !== id));
   const toggledHidden = (id: string, hidden: boolean) => update((l) => l.map((c) => (c.id === id ? { ...c, hidden } : c)));
 
